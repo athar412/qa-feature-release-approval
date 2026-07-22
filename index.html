@@ -1591,6 +1591,32 @@
       };
     }
 
+    
+    function resetCurrentForm() {
+      if (!confirm('Apakah Anda yakin ingin mengosongkan formulir dan membuat pengajuan baru?')) return;
+      
+      // Clear URL parameter ?id=...
+      if (window.history.pushState) {
+        window.history.pushState({}, document.title, window.location.pathname);
+      }
+
+      // Reset doc status
+      docStatus = 'PENDING';
+      rejectionReason = '';
+      currentDocId = null;
+
+      // Reload fresh page or clear editable fields
+      location.href = window.location.pathname;
+    }
+
+    function clearAllLocalStorageData() {
+      if (!confirm('Apakah Anda yakin ingin MENGHAPUS SELURUH RIWAYAT DOKUMEN lokal di browser ini?')) return;
+      localStorage.removeItem('holycat_qa_docs');
+      alert('Seluruh data lokal berhasil dibersihkan!');
+      location.href = window.location.pathname;
+    }
+
+
     function saveDocument() {
       if (!currentUser) { alert('Silakan login terlebih dahulu.'); return; }
       const state = getFormState();
