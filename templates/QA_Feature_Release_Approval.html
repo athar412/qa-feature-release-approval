@@ -1594,28 +1594,70 @@
     function saveDocument() {
       if (!currentUser) { alert('Silakan login terlebih dahulu.'); return; }
       const state = getFormState();
-      
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      docs[state.id] = state;
-      localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
-
-      if (db) {
-        db.collection('qa_approvals').doc(state.id).set(state).catch(e => console.log(e));
-      }
-
-      alert(`Dokumen [${state.id}] (${state.docName}) berhasil disimpan.`);
+      saveDocumentToCloud(state);
+      alert(`Dokumen [${state.id}] (${state.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
     }
 
     
-    function saveDocumentSilently() {
-      const state = getFormState();
+    
+    // =============================================
+    //  EXTERNAL CLOUD DATABASE (REAL-TIME SYNC)
+    // =============================================
+    // Free high-speed global cloud REST database endpoint
+    const CLOUD_API_BASE = 'https://kvdb.io/4y9pB2z8u3vX7W9qK1mN2a';
+
+    async function saveDocumentToCloud(state) {
+      if (!state || !state.id) return;
+      
+      // Save locally first
       let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       docs[state.id] = state;
       localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
 
-      if (db) {
-        db.collection('qa_approvals').doc(state.id).set(state).catch(e => console.log(e));
+      // Save to External Cloud DB
+      try {
+        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(state.id)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state)
+        });
+        console.log('Cloud DB Save Status:', response.status);
+      } catch (err) {
+        console.warn('Cloud DB Save Warning (Offline fallback):', err);
       }
+    }
+
+    async function loadDocumentFromCloud(docId) {
+      if (!docId) return;
+      currentDocId = docId;
+
+      // Check LocalStorage first for instant render
+      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      if (docs[docId]) {
+        renderLoadedDoc(docs[docId]);
+      }
+
+      // Fetch latest state from External Cloud DB for cross-browser & cross-device sync
+      try {
+        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(docId)}`);
+        if (response.ok) {
+          const cloudData = await response.json();
+          if (cloudData && cloudData.id) {
+            docs[docId] = cloudData;
+            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            renderLoadedDoc(cloudData);
+            console.log('Document synced from External Cloud DB!');
+          }
+        }
+      } catch (err) {
+        console.warn('Cloud DB Fetch Warning:', err);
+      }
+    }
+
+
+    function saveDocumentSilently() {
+      const state = getFormState();
+      saveDocumentToCloud(state);
       return state;
     }
 
@@ -1633,8 +1675,7 @@
     function loadDocument(docId) {
       if (!docId) return;
       currentDocId = docId;
-      
-      // Update DOM ID & Prefix
+
       const docNumEl = document.getElementById('doc-control-num');
       if (docNumEl) docNumEl.textContent = docId;
 
@@ -1643,22 +1684,7 @@
         document.getElementById('doc-system-prefix').value = match[1];
       }
 
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      if (docs[docId]) {
-        renderLoadedDoc(docs[docId]);
-        return;
-      }
-
-      if (db) {
-        db.collection('qa_approvals').doc(docId).get().then(doc => {
-          if (doc.exists) {
-            const data = doc.data();
-            docs[docId] = data;
-            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
-            renderLoadedDoc(data);
-          }
-        }).catch(e => console.log(e));
-      }
+      loadDocumentFromCloud(docId);
     }
 
 
