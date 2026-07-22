@@ -765,6 +765,70 @@
     }
     .form-control-sm:focus { outline: none; border-color: var(--primary); background: #ffffff; }
 
+  
+    /* MOBILE RESPONSIVE OPTIMIZATION */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 110px !important;
+      }
+      .navbar-container {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+        padding: 8px 12px !important;
+      }
+      .navbar-brand {
+        font-size: 13px !important;
+        justify-content: space-between !important;
+      }
+      .navbar-actions {
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+      }
+      .btn-sm {
+        padding: 5px 8px !important;
+        font-size: 11px !important;
+      }
+      .page-container {
+        padding: 16px 12px !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .doc-header {
+        flex-direction: column-reverse !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .header-main-logo {
+        height: 48px !important;
+      }
+      .doc-control-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+      }
+      table {
+        min-width: 600px;
+      }
+      .sign-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .modal-content {
+        width: 95% !important;
+        margin: 20px auto !important;
+        padding: 16px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -912,7 +976,7 @@
                 <td class="center"><span class="status status--pass">Pass</span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="label-helper no-print mt-16" style="font-size:11px; color:#64748b;">Catatan: Klik pada sel tabel untuk mengedit. Klik pada badge status untuk mengubah status.</div>
         <div style="display: flex; gap: 10px;" class="no-print">
@@ -992,7 +1056,7 @@
                 <td><span class="editable" contenteditable="true" data-placeholder="https://staging.holycatlabs.com"></span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>
@@ -1024,7 +1088,7 @@
                 <td><span class="editable" contenteditable="true" data-placeholder="Assignee..."></span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div style="display: flex; gap: 10px;" class="no-print">
           <button class="add-evidence-btn mt-16 btn btn-outline-secondary" onclick="addDefectRow()" style="flex: 1;">+ Tambah Baris Defect</button>
@@ -1103,7 +1167,7 @@
                 <td><span class="editable" contenteditable="true" data-placeholder="Mitigasi..."></span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
       </div>
     </div>
@@ -1192,7 +1256,7 @@
               <td><span class="editable" contenteditable="true" data-placeholder="DD/MM/YYYY"></span></td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
 
         <!-- Manager / Approver Decision Box -->
         <div id="approver-action-box" class="no-print mt-16" style="display:none; background:#f8fafc; border:1px solid var(--border); padding:18px; border-radius:8px;">
@@ -1230,7 +1294,7 @@
               <td><span class="editable" contenteditable="true" data-placeholder="Nama Penulis..."></span></td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
       </div>
     </div>
 
@@ -1320,7 +1384,7 @@
             <tbody id="history-table-body">
               <!-- Rendered dynamically -->
             </tbody>
-          </table>
+          </table></div>
         </div>
         <div class="modal-actions-row mt-16">
           <button class="btn btn-sm btn-secondary" onclick="closeHistoryModal()">Tutup</button>
@@ -1542,9 +1606,43 @@
       alert(`Dokumen [${state.id}] (${state.docName}) berhasil disimpan.`);
     }
 
+    
+    function saveDocumentSilently() {
+      const state = getFormState();
+      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      docs[state.id] = state;
+      localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+
+      if (db) {
+        db.collection('qa_approvals').doc(state.id).set(state).catch(e => console.log(e));
+      }
+      return state;
+    }
+
+    function shareDocumentLink() {
+      const state = saveDocumentSilently();
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(state.id)}`;
+      
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert(`Link Berbagi Dokumen berhasil disalin:\n${shareUrl}`);
+      }).catch(() => {
+        prompt('Salin link berbagi di bawah ini:', shareUrl);
+      });
+    }
+
     function loadDocument(docId) {
+      if (!docId) return;
       currentDocId = docId;
       
+      // Update DOM ID & Prefix
+      const docNumEl = document.getElementById('doc-control-num');
+      if (docNumEl) docNumEl.textContent = docId;
+
+      const match = docId.match(/^([A-Z]+)-REL/);
+      if (match && document.getElementById('doc-system-prefix')) {
+        document.getElementById('doc-system-prefix').value = match[1];
+      }
+
       let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       if (docs[docId]) {
         renderLoadedDoc(docs[docId]);
@@ -1554,11 +1652,15 @@
       if (db) {
         db.collection('qa_approvals').doc(docId).get().then(doc => {
           if (doc.exists) {
-            renderLoadedDoc(doc.data());
+            const data = doc.data();
+            docs[docId] = data;
+            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            renderLoadedDoc(data);
           }
-        });
+        }).catch(e => console.log(e));
       }
     }
+
 
     function renderLoadedDoc(data) {
       if (!data) return;
@@ -2091,13 +2193,14 @@ ${shareUrl}`);
     // ON LOAD INIT
     window.addEventListener('DOMContentLoaded', function() {
       updatePassRate();
-      updateAutoDocNumber();
       checkAuth();
 
       const params = new URLSearchParams(location.search);
       const urlDocId = params.get('id');
       if (urlDocId) {
         loadDocument(urlDocId);
+      } else {
+        updateAutoDocNumber();
       }
     });
   </script>
