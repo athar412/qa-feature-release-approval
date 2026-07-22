@@ -1,3 +1,13 @@
+# Standalone App Ignore
+backend-holycat-commerce/
+backend-laravel-holydis/
+holycat-frontend-ecommerce/
+merchant-frontend/
+posyancing-backend/
+posyancing-frontend/
+webprofile-holycat/
+Laporan_Handover_Formal_QA.pdf
+
 *.py
 *.pyc
 __pycache__/
