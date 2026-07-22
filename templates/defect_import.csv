@@ -1,0 +1,3 @@
+Bug ID,Deskripsi Bug,Severity,Status,Assignee
+BUG-001,Input nomor telepon menerima karakter non-numeric (huruf/simbol),High,Closed,Fajar Al Farizi
+BUG-002,Edit photocard menimpa foto polos asli sehingga tidak bisa di-re-edit dari gambar bersih,Medium,Closed,Fajar Al Farizi

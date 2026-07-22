@@ -1,0 +1,11 @@
+REQ ID,Deskripsi Kebutuhan / Objective,TC ID,Metode,Status
+REQ-ADM-01,Admin dapat menambah template photocard baru (format PNG) dengan poin & rarity tertentu,TC-ADM-01,Manual,Pass
+REQ-ADM-02,Admin dapat melihat daftar dan detail photocard yang telah dibuat oleh pengguna,TC-ADM-02,Manual,Pass
+REQ-USR-01,User dapat mengakses editor photocard langsung via URL khusus template (QR scan),TC-USR-01,Manual,Pass
+REQ-USR-02,User dapat mengunggah foto, melakukan geser (drag) dan perbesaran (zoom) foto di editor,TC-USR-02,Manual,Pass
+REQ-USR-03,User dapat menyimpan photocard ke galeri pribadi dan melihat progress koleksi,TC-USR-03,Manual,Pass
+REQ-USR-04,User dapat mengunduh photocard tertentu tanpa gambar menjadi gepeng/berubah aspek rasio,TC-USR-04,Manual,Pass
+REQ-USR-05,Leaderboard poin koleksi photocard tampil secara akurat di halaman galeri user,TC-USR-05,Manual,Pass
+REQ-SYS-01,Poin user hanya bertambah sekali per template unik (tidak bertambah pada duplikasi template),TC-SYS-01,Manual,Pass
+REQ-SYS-02,Sesi login user tetap terjaga saat menyimpan foto (tidak perlu mengulang edit dari awal),TC-SYS-02,Manual,Pass
+REQ-BUG-01,Input nomor telepon pada form hanya menerima karakter integer (angka saja),TC-BUG-01,Manual,Pass
