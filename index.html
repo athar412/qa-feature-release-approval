@@ -2956,209 +2956,19 @@
       applyAuthUI();
     }
 
-    function approveDocumentAction() {
-      if (!currentUser || (currentUser.role !== 'product-owner' && currentUser.role !== 'tech-lead')) {
-        alert('Hanya Product Manager / Tech Lead yang berhak memberikan persetujuan akhir.');
-        return;
-      }
-
-      if (confirm('Apakah Anda yakin ingin menyetujui dan mengunci dokumen ini secara formal? Dokumen akan menjadi Disetujui (Read-Only).')) {
-        docStatus = 'APPROVED';
-        saveDocument();
-        updateStatusBanners();
-      }
-    }
-
-    function rejectDocumentAction() {
-      if (!currentUser || (currentUser.role !== 'product-owner' && currentUser.role !== 'tech-lead')) {
-        alert('Hanya Product Manager / Tech Lead yang berhak menolak dokumen.');
-        return;
-      }
-
-      const reason = prompt('Masukkan alasan penolakan dokumen ini untuk perbaikan tim QA:');
-      if (reason !== null && reason.trim() !== '') {
-        docStatus = 'REJECTED';
-        rejectionReason = reason.trim();
-        saveDocument();
-        updateStatusBanners();
-      }
-    }
-
-    function lockDocumentUI() {
-      setElementStyle('btn-save-doc', 'display', 'none');
-      setElementStyle('approver-action-box', 'display', 'none');
-      
-      document.querySelectorAll('.btn-sig-trigger, .add-evidence-btn, input[type="file"]').forEach(el => {
-        el.style.display = 'none';
-      });
-
-      document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-        el.setAttribute('contenteditable', 'false');
-      });
-
-      document.querySelectorAll('input[type="radio"], input[type="file"]').forEach(el => {
-        el.disabled = true;
-      });
-    }
-
-    function copyShareLink() {
-      const docNum = document.getElementById('doc-control-num').textContent.trim();
-      const shareUrl = `${location.origin}${location.pathname}?id=${encodeURIComponent(docNum)}`;
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        alert(`Link berbagi dokumen berhasil disalin:
-${shareUrl}`);
-      });
-    }
-
     
     // ================================================================
-    //  HISTORY MODAL & SUPABASE TABLE ENGINE
-    // ================================================================
-        
-    // ================================================================
-    //  DIGITAL SIGNATURE CANVAS & MANAGER APPROVAL ENGINE
-    // ================================================================
-    
-    let isDrawing = false;
-    let lastX = 0;
-    let lastY = 0;
-    let signedRoles = {
-      'qa-lead': false,
-      'tech-lead': false,
-      'product-owner': false
-    };
-
-    function initSignatureCanvas() {
-      const canvas = document.getElementById('signature-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.lineWidth = 2.5;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = '#0f172a';
-
-      function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return {
-          x: clientX - rect.left,
-          y: clientY - rect.top
-        };
-      }
-
-      function startDrawing(e) {
-        isDrawing = true;
-        const pos = getPos(e);
-        lastX = pos.x;
-        lastY = pos.y;
-      }
-
-      function draw(e) {
-        if (!isDrawing) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        lastX = pos.x;
-        lastY = pos.y;
-      }
-
-      function stopDrawing() {
-        isDrawing = false;
-      }
-
-      canvas.onmousedown = startDrawing;
-      canvas.onmousemove = draw;
-      canvas.onmouseup = stopDrawing;
-      canvas.onmouseleave = stopDrawing;
-
-      canvas.ontouchstart = startDrawing;
-      canvas.ontouchmove = draw;
-      canvas.ontouchend = stopDrawing;
-    }
-
-    function openSignatureModal(role) {
-      if (!currentUser) {
-        alert("Silakan login terlebih dahulu untuk melakukan tanda tangan digital.");
-        setElementStyle('login-modal', 'display', 'flex');
-        return;
-      }
-      activeSignatureRole = role;
-      setElementStyle('signature-modal', 'display', 'flex');
-      clearSignatureCanvas();
-      setTimeout(initSignatureCanvas, 100);
-    }
-
-    function closeSignatureModal() {
-      setElementStyle('signature-modal', 'display', 'none');
-      activeSignatureRole = null;
-    }
-
-    function clearSignatureCanvas() {
-      const canvas = document.getElementById('signature-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    function uploadSignatureFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        applySignatureImageSrc(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function applySignature() {
-      const canvas = document.getElementById('signature-canvas');
-      if (!canvas) return;
-      const dataUrl = canvas.toDataURL('image/png');
-      applySignatureImageSrc(dataUrl);
-    }
-
-    function applySignatureImageSrc(imgSrc) {
-      if (!activeSignatureRole) activeSignatureRole = 'product-owner';
-      const container = document.getElementById(`sig-container-${activeSignatureRole}`);
-      if (container) {
-        container.innerHTML = `<img src="${imgSrc}" style="max-height:60px; max-width:180px; object-fit:contain;" alt="Signature" />`;
-      }
-      const btnSig = document.getElementById(`btn-sig-${activeSignatureRole}`);
-      if (btnSig) btnSig.style.display = 'none';
-
-      signedRoles[activeSignatureRole] = true;
-      closeSignatureModal();
-
-      // Auto save document state
-      saveDocument();
-    }
-
-    // MANAGER / PO APPROVAL & REJECTION RULE
-    
-    // ================================================================
-    //  MANAGER APPROVAL & REJECTION ACTIONS (UNIFIED BINDING)
+    //  UNIFIED SINGLE MANAGER APPROVAL & REJECTION ENGINE
     // ================================================================
     function approveDocumentAction() {
-      approveRelease();
-    }
-
-    function rejectDocumentAction() {
-      rejectRelease();
-    }
-
-    function approveRelease() {
       if (!currentUser) {
         alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
         return;
       }
 
-      if (currentUser.role !== 'product-owner') {
-        alert("Akses Ditolak: Hanya Product Owner / Manager yang memiliki wewenang untuk menyetujui rilis.");
+      if (currentUser.role !== 'product-owner' && currentUser.role !== 'tech-lead') {
+        alert("Akses Ditolak: Hanya Product Owner / Manager atau Tech Lead yang memiliki wewenang untuk menyetujui rilis.");
         return;
       }
 
@@ -3172,7 +2982,7 @@ ${shareUrl}`);
         return;
       }
 
-      if (confirm("Apakah Anda yakin ingin MENYETUJUI rilis fitur ini ke lingkungan Production? Dokumen akan dikunci setelah disetujui.")) {
+      if (confirm("Apakah Anda yakin ingin MENYETUJUI rilis fitur ini ke lingkungan Production? Dokumen akan dikunci secara formal setelah disetujui.")) {
         docStatus = 'APPROVED';
         lockDocumentUI();
         updateStatusBanners();
@@ -3181,25 +2991,34 @@ ${shareUrl}`);
       }
     }
 
-    function rejectRelease() {
+    function rejectDocumentAction() {
       if (!currentUser) {
         alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
         return;
       }
 
-      if (currentUser.role !== 'product-owner') {
-        alert("Akses Ditolak: Hanya Product Owner / Manager yang memiliki wewenang untuk menolak rilis.");
+      if (currentUser.role !== 'product-owner' && currentUser.role !== 'tech-lead') {
+        alert("Akses Ditolak: Hanya Product Owner / Manager atau Tech Lead yang memiliki wewenang untuk menolak rilis.");
         return;
       }
 
-      const reason = prompt("Masukkan alasan penolakan rilis ini:");
-      if (reason !== null) {
+      const reason = prompt("Masukkan alasan penolakan rilis dokumen ini untuk perbaikan tim QA:");
+      if (reason !== null && reason.trim() !== '') {
         docStatus = 'REJECTED';
+        rejectionReason = reason.trim();
         updateStatusBanners();
         saveDocument();
         alert("Dokumen telah ditandai DITOLAK.");
       }
+    }
+
+    function approveRelease() {
+      approveDocumentAction();
+    }
+
+    function rejectRelease() {
+      rejectDocumentAction();
     }
 
 
