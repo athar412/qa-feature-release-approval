@@ -2477,10 +2477,15 @@
     function checkAuth() {
       const savedUserStr = localStorage.getItem('holycat_qa_user');
       if (savedUserStr) {
-        currentUser = JSON.parse(savedUserStr);
-        applyAuthUI();
+        try {
+          currentUser = JSON.parse(savedUserStr);
+          applyAuthUI();
+        } catch (e) {
+          currentUser = null;
+        }
       } else {
-        setElementStyle('login-modal', 'display', 'flex');
+        // Keep login modal hidden by default so guest users can browse home and history
+        setElementStyle('login-modal', 'display', 'none');
       }
     }
 
@@ -3807,6 +3812,10 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
     }
 
     function createNewDocument() {
+      if (!currentUser) {
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
       const year = new Date().getFullYear();
       const randomNum = Math.floor(100 + Math.random() * 900);
       const newId = `QA-REL-${year}-${randomNum}`;
