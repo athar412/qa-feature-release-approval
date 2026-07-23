@@ -208,6 +208,23 @@
       }
     }
 
+    
+    function lockDocumentUI() {
+      setElementStyle('btn-save-doc', 'display', 'none');
+      const printBtn = document.getElementById('btn-print-doc');
+      if (printBtn) printBtn.style.setProperty('display', 'inline-flex', 'important');
+
+      setGeneralEditable(false);
+      setKnownIssuesEditable(false);
+      setAddButtonsVisible(false);
+
+      setElementStyle('btn-sig-qa-lead', 'display', 'none');
+      setElementStyle('btn-sig-tech-lead', 'display', 'none');
+      setElementStyle('btn-sig-product-owner', 'display', 'none');
+      setElementStyle('approver-action-box', 'display', 'none');
+    }
+
+
     function applyAuthUI() {
       if (!currentUser) {
         checkAuth();
