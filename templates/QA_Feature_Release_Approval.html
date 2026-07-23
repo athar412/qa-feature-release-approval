@@ -2326,7 +2326,7 @@
   </div> <!-- /form-view -->
 
   <!-- LOGIN MODAL -->
-  <div id="login-modal" class="modal-overlay no-print">
+  <div id="login-modal" class="modal-overlay no-print" style="display: none;">
     <div class="modal-card">
       <div class="modal-header">Otentikasi Peran Pengguna (PT Holycatlabs)</div>
       <div class="modal-body">
@@ -2475,6 +2475,7 @@
     let activeSignatureRole = null;
 
     function checkAuth() {
+      setElementStyle('login-modal', 'display', 'none');
       const savedUserStr = localStorage.getItem('holycat_qa_user');
       if (savedUserStr) {
         try {
@@ -2483,9 +2484,6 @@
         } catch (e) {
           currentUser = null;
         }
-      } else {
-        // Keep login modal hidden by default so guest users can browse home and history
-        setElementStyle('login-modal', 'display', 'none');
       }
     }
 

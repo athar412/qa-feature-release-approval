@@ -65,6 +65,7 @@
     let activeSignatureRole = null;
 
     function checkAuth() {
+      setElementStyle('login-modal', 'display', 'none');
       const savedUserStr = localStorage.getItem('holycat_qa_user');
       if (savedUserStr) {
         try {
@@ -73,9 +74,6 @@
         } catch (e) {
           currentUser = null;
         }
-      } else {
-        // Keep login modal hidden by default so guest users can browse home and history
-        setElementStyle('login-modal', 'display', 'none');
       }
     }
 
