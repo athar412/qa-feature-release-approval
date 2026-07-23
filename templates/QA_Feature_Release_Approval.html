@@ -1336,6 +1336,10 @@
     }
 
 </style>
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/@supabase-js@2" defer></script>
+  <!-- Fallback local script if npm CDN is slow -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1960,6 +1964,22 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // ================================================================
+    //  SUPABASE DATABASE INTEGRATION (WITH TRANSPARENT LOCAL STORAGE FALLBACK)
+    // ================================================================
+    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+    
+    let supabaseClient = null;
+    try {
+      if (typeof supabase !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase client active.");
+      }
+    } catch (e) {
+      console.warn("Supabase credentials not configured yet, falling back to local storage.", e);
+    }
+
     // =============================================
     //  FIREBASE & LOCALSTORAGE BACKEND SETUP
     // =============================================
@@ -2197,6 +2217,12 @@
     // Free high-speed global cloud REST database endpoint
     const CLOUD_API_BASE = 'https://kvdb.io/4y9pB2z8u3vX7W9qK1mN2a';
 
+    
+    // =============================================
+    //  EXTERNAL CLOUD DATABASE (SUPABASE + KVDB FALLBACK)
+    // =============================================
+    const CLOUD_API_BASE = 'https://kvdb.io/4y9pB2z8u3vX7W9qK1mN2a';
+
     async function saveDocumentToCloud(state) {
       if (!state || !state.id) return;
       
@@ -2205,16 +2231,41 @@
       docs[state.id] = state;
       localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
 
-      // Save to External Cloud DB
+      // Attempt to save to Supabase if client is active
+      if (supabaseClient) {
+        try {
+          const sysCode = state.id.split('-')[0] || 'QA';
+          const { data, error } = await supabaseClient
+            .from('qa_documents')
+            .upsert({
+              id: state.id,
+              system_code: sysCode,
+              doc_title: state.docName || 'Formulir Persetujuan Rilis',
+              doc_version: '1.0',
+              release_version: '1.0',
+              sprint: '1',
+              status: state.status || 'PENDING',
+              document_data: state,
+              updated_at: new Date().toISOString()
+            });
+          if (error) throw error;
+          console.log('Supabase Save Success:', state.id);
+          return; // Skip KVDB if Supabase succeeded
+        } catch (err) {
+          console.warn('Supabase Save failed, falling back to KVDB:', err.message);
+        }
+      }
+
+      // Fallback to legacy KVDB
       try {
         const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(state.id)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(state)
         });
-        console.log('Cloud DB Save Status:', response.status);
+        console.log('Legacy Cloud DB Save Status:', response.status);
       } catch (err) {
-        console.warn('Cloud DB Save Warning (Offline fallback):', err);
+        console.warn('Legacy Cloud DB Save Warning (Offline fallback):', err);
       }
     }
 
@@ -2228,7 +2279,31 @@
         renderLoadedDoc(docs[docId]);
       }
 
-      // Fetch latest state from External Cloud DB for cross-browser & cross-device sync
+      // Attempt to load from Supabase if client is active
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('qa_documents')
+            .select('document_data')
+            .eq('id', docId)
+            .single();
+
+          if (!error && data && data.document_data) {
+            const supabaseData = data.document_data;
+            docs[docId] = supabaseData;
+            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            renderLoadedDoc(supabaseData);
+            console.log('Document loaded successfully from Supabase!');
+            return; // Skip KVDB if Supabase succeeded
+          } else {
+            console.warn('Supabase load returned empty, checking legacy cloud...');
+          }
+        } catch (err) {
+          console.warn('Supabase fetch failed, falling back to legacy cloud:', err.message);
+        }
+      }
+
+      // Fallback to legacy KVDB
       try {
         const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(docId)}`);
         if (response.ok) {
@@ -2237,13 +2312,14 @@
             docs[docId] = cloudData;
             localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
             renderLoadedDoc(cloudData);
-            console.log('Document synced from External Cloud DB!');
+            console.log('Document synced from Legacy Cloud DB!');
           }
         }
       } catch (err) {
-        console.warn('Cloud DB Fetch Warning:', err);
+        console.warn('Legacy Cloud DB Fetch Warning:', err);
       }
     }
+
 
 
     function saveDocumentSilently() {
