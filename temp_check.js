@@ -423,14 +423,14 @@
       setElementStyle('status-banner-approved', 'display', 'none');
       setElementStyle('status-banner-rejected', 'display', 'none');
 
-      if (docStatus === 'APPROVED' || docStatus === 'REJECTED') {
+      if (docStatus === 'APPROVED') {
         setElementStyle('status-banner-approved', 'display', 'flex');
         lockDocumentUI();
       } else if (docStatus === 'REJECTED') {
         setElementStyle('status-banner-rejected', 'display', 'flex');
         const reasonEl = document.getElementById('rejection-reason-text');
         if (reasonEl) {
-          reasonEl.innerHTML = `<strong>Alasan Penolakan:</strong> ${rejectionReason || 'Ditolak untuk revisi dan perbaikan tim'}`;
+          reasonEl.innerHTML = '<strong>Alasan Penolakan:</strong> ' + (rejectionReason || 'Ditolak untuk revisi dan perbaikan tim');
         }
         lockDocumentUI();
       } else {
