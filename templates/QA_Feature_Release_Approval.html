@@ -991,9 +991,13 @@
     
     @media (max-width: 768px) {
       .top-navbar {
-        height: 56px;
-        padding: 0 12px;
-        position: relative;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 56px !important;
+        padding: 0 12px !important;
+        z-index: 1001 !important;
       }
       .nav-brand {
         gap: 8px;
@@ -1052,8 +1056,8 @@
         height: 36px;
         font-size: 12px;
       }
-      .nav-actions .history-popover-wrapper button,
-      .nav-actions .share-popover-wrapper button {
+      .nav-actions .history-popover-wrapper > button,
+      .nav-actions .share-popover-wrapper > button {
         width: 100% !important;
         justify-content: center;
         height: 36px;
