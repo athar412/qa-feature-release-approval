@@ -2474,7 +2474,78 @@
     let rejectionReason = '';
     let activeSignatureRole = null;
 
-        function checkAuth() {
+        
+    // ================================================================
+    //  AUTHENTICATION & PRIVILEGE SYSTEM ENGINE
+    // ================================================================
+    function processLogin() {
+      const usernameInput = (document.getElementById('login-username')?.value || '').trim().toLowerCase();
+      const passwordInput = (document.getElementById('login-password')?.value || '').trim();
+      const errorMsg = document.getElementById('login-error');
+
+      if (!usernameInput) {
+        if (errorMsg) {
+          errorMsg.textContent = 'Silakan masukkan nama pengguna (username).';
+          errorMsg.style.display = 'block';
+        }
+        return;
+      }
+
+      let user = null;
+
+      if (usernameInput.includes('qa')) {
+        user = { username: usernameInput, role: 'qa-lead', title: 'QA Lead (Quality Assurance)', name: 'Budi Santoso' };
+      } else if (usernameInput.includes('tech')) {
+        user = { username: usernameInput, role: 'tech-lead', title: 'Tech Lead (Senior System Architect)', name: 'Eko Prasetyo' };
+      } else if (usernameInput.includes('product') || usernameInput.includes('po') || usernameInput.includes('manager')) {
+        user = { username: usernameInput, role: 'product-owner', title: 'Product Owner (PO / Manager)', name: 'Siti Rahma' };
+      } else {
+        // Fallback default role QA Lead for any input username
+        user = { username: usernameInput, role: 'qa-lead', title: 'QA Lead (Quality Assurance)', name: usernameInput };
+      }
+
+      if (errorMsg) errorMsg.style.display = 'none';
+
+      currentUser = user;
+      localStorage.setItem('holycat_qa_user', JSON.stringify(user));
+
+      // Hide login modal
+      setElementStyle('login-modal', 'display', 'none');
+
+      // Apply Auth UI
+      applyAuthUI();
+
+      // Show Home View
+      showHomeView();
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('holycat_qa_user');
+      currentUser = null;
+
+      // Reset navbar user display
+      const navDisplay = document.getElementById('nav-user-display');
+      if (navDisplay) navDisplay.textContent = 'Pengguna: Belum Login';
+      const mobDisplay = document.getElementById('mobile-user-display');
+      if (mobDisplay) mobDisplay.textContent = 'Pengguna: Belum Login';
+
+      // Set auth button back to Login state in navbar
+      const authBtn = document.getElementById('nav-btn-auth');
+      if (authBtn) {
+        authBtn.className = 'btn btn-sm btn-primary';
+        authBtn.innerHTML = '🔑 Masuk / Login';
+        authBtn.onclick = function() { setElementStyle('login-modal', 'display', 'flex'); };
+      }
+
+      // Show Home View
+      showHomeView();
+
+      // STRICT REQUIREMENT: LOCK APPLICATION AGAIN WITH LOGIN MODAL ON LOGOUT
+      setElementStyle('login-modal', 'display', 'flex');
+    }
+
+
+    function checkAuth() {
       const savedUserStr = localStorage.getItem('holycat_qa_user');
       if (savedUserStr) {
         try {
