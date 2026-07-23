@@ -488,15 +488,77 @@ ${shareUrl}`);
       });
     }
 
+    
+    // ================================================================
+    //  HISTORY MODAL & SUPABASE TABLE ENGINE
+    // ================================================================
     function openHistoryModal() {
       setElementStyle('history-modal', 'display', 'flex');
       renderHistoryTable();
     }
 
-
     function closeHistoryModal() {
       setElementStyle('history-modal', 'display', 'none');
     }
+
+    function loadHistoryDocument(docId) {
+      closeHistoryModal();
+      showFormView(docId);
+    }
+
+    async function renderHistoryTable() {
+      const tbody = document.getElementById('history-table-body');
+      if (!tbody) {
+        console.error("history-table-body element not found!");
+        return;
+      }
+
+      const searchQuery = (document.getElementById('history-search-input')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('history-status-filter')?.value || 'ALL';
+      
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Memuat dokumen dari Supabase Database...</td></tr>';
+
+      const docs = await fetchAllSupabaseDocuments();
+
+      let filteredDocs = docs.filter(d => {
+        const textMatch = (d.id || '').toLowerCase().includes(searchQuery) ||
+                          (d.docName || '').toLowerCase().includes(searchQuery) ||
+                          (d.docDate || d.date || '').toLowerCase().includes(searchQuery);
+        
+        let statusMatch = true;
+        if (statusFilter === 'PENDING') statusMatch = (d.status === 'PENDING');
+        else if (statusFilter === 'APPROVED') statusMatch = (d.status === 'APPROVED');
+        else if (statusFilter === 'REJECTED') statusMatch = (d.status === 'REJECTED');
+
+        return textMatch && statusMatch;
+      });
+
+      tbody.innerHTML = '';
+
+      if (filteredDocs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada dokumen yang sesuai filter di Supabase Database.</td></tr>';
+      } else {
+        filteredDocs.forEach(d => {
+          const tr = document.createElement('tr');
+          
+          let statusBadge = '<span class="status-badge status-badge--pending">MENUNGGU</span>';
+          if (d.status === 'APPROVED') statusBadge = '<span class="status-badge status-badge--approved">DISETUJUI</span>';
+          else if (d.status === 'REJECTED') statusBadge = '<span class="status-badge status-badge--rejected">DITOLAK</span>';
+
+          tr.innerHTML = `
+            <td><strong>${d.id}</strong></td>
+            <td>${d.docName || 'Formulir Persetujuan Rilis'}</td>
+            <td>${d.date || d.docDate || 'Terbaru'}</td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="loadHistoryDocument('${d.id}')">Buka</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
 
     // =============================================
     //  DIGITAL SIGNATURE CANVAS LOGIC
@@ -1317,7 +1379,8 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
 
       // Show document-specific navbar buttons on Form View
       setElementStyle('btn-save-doc', 'display', 'inline-flex');
-      setElementStyle('btn-print-doc', 'display', 'inline-flex');
+      const printBtn = document.getElementById('btn-print-doc');
+      if (printBtn) printBtn.style.setProperty('display', 'inline-flex', 'important');
       const shareWrap = document.querySelector('.share-popover-wrapper');
       if (shareWrap) shareWrap.style.display = 'inline-block';
 
