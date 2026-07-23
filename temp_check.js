@@ -568,7 +568,184 @@ ${shareUrl}`);
     // ================================================================
     //  HISTORY MODAL & SUPABASE TABLE ENGINE
     // ================================================================
-        async function openHistoryModal() {
+        
+    // ================================================================
+    //  DIGITAL SIGNATURE CANVAS & MANAGER APPROVAL ENGINE
+    // ================================================================
+    
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let signedRoles = {
+      'qa-lead': false,
+      'tech-lead': false,
+      'product-owner': false
+    };
+
+    function initSignatureCanvas() {
+      const canvas = document.getElementById('signature-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0f172a';
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: clientX - rect.left,
+          y: clientY - rect.top
+        };
+      }
+
+      function startDrawing(e) {
+        isDrawing = true;
+        const pos = getPos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function draw(e) {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function stopDrawing() {
+        isDrawing = false;
+      }
+
+      canvas.onmousedown = startDrawing;
+      canvas.onmousemove = draw;
+      canvas.onmouseup = stopDrawing;
+      canvas.onmouseleave = stopDrawing;
+
+      canvas.ontouchstart = startDrawing;
+      canvas.ontouchmove = draw;
+      canvas.ontouchend = stopDrawing;
+    }
+
+    function openSignatureModal(role) {
+      if (!currentUser) {
+        alert("Silakan login terlebih dahulu untuk melakukan tanda tangan digital.");
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+      activeSignatureRole = role;
+      setElementStyle('signature-modal', 'display', 'flex');
+      clearSignatureCanvas();
+      setTimeout(initSignatureCanvas, 100);
+    }
+
+    function closeSignatureModal() {
+      setElementStyle('signature-modal', 'display', 'none');
+      activeSignatureRole = null;
+    }
+
+    function clearSignatureCanvas() {
+      const canvas = document.getElementById('signature-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function uploadSignatureFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        applySignatureImageSrc(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applySignature() {
+      const canvas = document.getElementById('signature-canvas');
+      if (!canvas) return;
+      const dataUrl = canvas.toDataURL('image/png');
+      applySignatureImageSrc(dataUrl);
+    }
+
+    function applySignatureImageSrc(imgSrc) {
+      if (!activeSignatureRole) activeSignatureRole = 'product-owner';
+      const container = document.getElementById(`sig-container-${activeSignatureRole}`);
+      if (container) {
+        container.innerHTML = `<img src="${imgSrc}" style="max-height:60px; max-width:180px; object-fit:contain;" alt="Signature" />`;
+      }
+      const btnSig = document.getElementById(`btn-sig-${activeSignatureRole}`);
+      if (btnSig) btnSig.style.display = 'none';
+
+      signedRoles[activeSignatureRole] = true;
+      closeSignatureModal();
+
+      // Auto save document state
+      saveDocument();
+    }
+
+    // MANAGER / PO APPROVAL & REJECTION RULE
+    function approveRelease() {
+      if (!currentUser) {
+        alert("Silakan login sebagai Product Owner / Manager untuk memberikan persetujuan.");
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+
+      if (currentUser.role !== 'product-owner') {
+        alert("Akses Ditolak: Hanya Product Owner / Manager yang memiliki wewenang untuk menyetujui rilis.");
+        return;
+      }
+
+      // RULE REQUIREMENT: MANAGER MUST SIGN HIMSELF FIRST BEFORE APPROVING!
+      const poContainer = document.getElementById('sig-container-product-owner');
+      const hasPoSignature = signedRoles['product-owner'] || (poContainer && poContainer.querySelector('img') !== null);
+
+      if (!hasPoSignature) {
+        alert("⚠️ PERHATIAN MANAGER:\n\nAnda belum melakukan Tanda Tangan Digital pada tabel persetujuan! Silakan lakukan tanda tangan digital Anda terlebih dahulu sebelum menyetujui rilis.");
+        openSignatureModal('product-owner');
+        return;
+      }
+
+      if (confirm("Apakah Anda yakin ingin MENYETUJUI rilis fitur ini ke lingkungan Production? Dokumen akan dikunci setelah disetujui.")) {
+        docStatus = 'APPROVED';
+        lockDocumentUI();
+        updateStatusBanners();
+        saveDocument();
+        alert(" Dokumen Berhasil Disetujui & Dikunci!");
+      }
+    }
+
+    function rejectRelease() {
+      if (!currentUser) {
+        alert("Silakan login sebagai Product Owner / Manager untuk menolak rilis.");
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+
+      if (currentUser.role !== 'product-owner') {
+        alert("Akses Ditolak: Hanya Product Owner / Manager yang memiliki wewenang untuk menolak rilis.");
+        return;
+      }
+
+      const reason = prompt("Masukkan alasan penolakan rilis ini:");
+      if (reason !== null) {
+        docStatus = 'REJECTED';
+        updateStatusBanners();
+        saveDocument();
+        alert("Dokumen telah ditandai DITOLAK.");
+      }
+    }
+
+
+    async function openHistoryModal() {
       setElementStyle('history-modal', 'display', 'flex');
       await renderHistoryTable();
     }
