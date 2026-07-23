@@ -1085,6 +1085,110 @@
       }
     }
 
+
+    /* --- ELEGANT COMPACT TYPOGRAPHY & LAYOUT OPTIMIZATION --- */
+    body {
+      font-size: 12.5px !important;
+      line-height: 1.45 !important;
+    }
+    
+    /* Document Title & Subtitle */
+    .doc-title {
+      font-size: 17px !important;
+      font-weight: 700 !important;
+    }
+    .doc-subtitle {
+      font-size: 10.5px !important;
+    }
+    
+    /* Section Titles & Numbers */
+    .section-title {
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: var(--text-main);
+    }
+    .section-number {
+      width: 20px !important;
+      height: 20px !important;
+      font-size: 9.5px !important;
+      border-radius: 4px !important;
+    }
+    
+    /* Forms, Controls, and Inputs */
+    .form-control, .editable, select.form-control {
+      font-size: 11.5px !important;
+      padding: 5px 8px !important;
+    }
+    .form-group label {
+      font-size: 10.5px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.3px !important;
+      margin-bottom: 4px !important;
+    }
+    
+    /* Data Tables & RTM */
+    .data-table th {
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.5px !important;
+      padding: 6px 10px !important;
+    }
+    .data-table td {
+      font-size: 11px !important;
+      padding: 6px 10px !important;
+    }
+    .callout-text {
+      font-size: 11.5px !important;
+    }
+    
+    /* Buttons */
+    .btn {
+      font-size: 10.5px !important;
+      padding: 4px 8px !important;
+    }
+    .btn-sm {
+      font-size: 9.5px !important;
+      padding: 3px 6px !important;
+    }
+    
+    /* Banners & Badges */
+    .status-banner {
+      font-size: 10px !important;
+      padding: 8px 12px !important;
+    }
+    
+    /* Popover items */
+    .popover-item .doc-title-mini {
+      font-size: 10.5px !important;
+    }
+    .popover-item .doc-meta {
+      font-size: 8.5px !important;
+    }
+
+    /* --- MOBILE MARGIN & SPACING OPTIMIZATIONS (ELIMINATE BLANK SPACE) --- */
+    @media (max-width: 768px) {
+      body {
+        padding-top: 56px !important; /* Matches top-navbar mobile height */
+      }
+      .page-container {
+        margin-top: 0px !important; /* Eliminates top blank space completely */
+        padding-top: 8px !important;
+        gap: 10px !important;
+      }
+      .doc-header {
+        padding: 12px 16px !important;
+      }
+      .doc-title {
+        font-size: 15px !important;
+      }
+      .section-title {
+        font-size: 12.5px !important;
+      }
+      .status-banner {
+        font-size: 9.5px !important;
+      }
+    }
+
 </style>
 </head>
 <body>
