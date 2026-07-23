@@ -721,10 +721,10 @@
       });
     });
 
-    function saveDocument() {
+    async function saveDocument() {
       if (!currentUser) { alert('Silakan login terlebih dahulu.'); return; }
       const state = getFormState();
-      saveDocumentToCloud(state);
+      await saveDocumentToCloud(state);
       alert(`Dokumen [${state.id}] (${state.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
     }
 
@@ -745,9 +745,9 @@
       if (!state || !state.id) return;
       
       // Save locally first
-      let docs = JSON.parse('{}' || '{}');
+      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       docs[state.id] = state;
-      // localStorage docs bypassed);
+      localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
 
       // Attempt to save to Supabase if client is active
       if (supabaseClient) {
@@ -792,7 +792,7 @@
       currentDocId = docId;
 
       // Check LocalStorage first for instant render
-      let docs = JSON.parse('{}' || '{}');
+      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       if (docs[docId]) {
         renderLoadedDoc(docs[docId]);
       }
@@ -809,7 +809,7 @@
           if (!error && data && data.document_data) {
             const supabaseData = data.document_data;
             docs[docId] = supabaseData;
-            // localStorage docs bypassed);
+            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
             renderLoadedDoc(supabaseData);
             console.log('Document loaded successfully from Supabase!');
             return; // Skip KVDB if Supabase succeeded
@@ -828,7 +828,7 @@
           const cloudData = await response.json();
           if (cloudData && cloudData.id) {
             docs[docId] = cloudData;
-            // localStorage docs bypassed);
+            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
             renderLoadedDoc(cloudData);
             console.log('Document synced from Legacy Cloud DB!');
           }
@@ -1047,7 +1047,7 @@
       const container = document.getElementById('popover-history-list');
       if (!container) return;
 
-      const docs = JSON.parse('{}' || '{}');
+      const docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       const docIds = Object.keys(docs);
 
       if (docIds.length === 0) {
@@ -1319,10 +1319,10 @@
 
       // 3. Delete from LocalStorage
       try {
-        let docs = JSON.parse('{}' || '{}');
+        let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
         if (docs[docId]) {
           delete docs[docId];
-          // localStorage docs bypassed);
+          localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
         }
       } catch(e) {}
 
