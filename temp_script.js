@@ -1100,3 +1100,221 @@ ${shareUrl}`);
 
 
   
+    // =============================================
+    //  HOME VIEW & FORM VIEW NAVIGATION ENGINE
+    // =============================================
+    let allHomeDocs = [];
+
+    async function fetchAllDocumentsForHome() {
+      allHomeDocs = [];
+      // 1. Fetch from LocalStorage
+      try {
+        const localDocs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        Object.values(localDocs).forEach(d => {
+          if (d && d.id) allHomeDocs.push(d);
+        });
+      } catch(e) {}
+
+      // 2. Fetch from Supabase if active
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('qa_documents')
+            .select('*')
+            .order('updated_at', { ascending: false });
+
+          if (!error && data) {
+            data.forEach(item => {
+              if (item.document_data) {
+                // Upsert to local list
+                const idx = allHomeDocs.findIndex(x => x.id === item.id);
+                if (idx !== -1) {
+                  allHomeDocs[idx] = item.document_data;
+                } else {
+                  allHomeDocs.push(item.document_data);
+                }
+              }
+            });
+          }
+        } catch(err) {
+          console.warn("Supabase fetch all for home error:", err);
+        }
+      }
+
+      renderHomeDashboard();
+    }
+
+    function renderHomeDashboard() {
+      // Calculate Stats
+      const total = allHomeDocs.length;
+      const approved = allHomeDocs.filter(d => d.status === 'APPROVED').length;
+      const rejected = allHomeDocs.filter(d => d.status === 'REJECTED').length;
+      const pending = total - approved - rejected;
+
+      document.getElementById('stat-total-docs').textContent = total;
+      document.getElementById('stat-approved-docs').textContent = approved;
+      document.getElementById('stat-pending-docs').textContent = pending;
+      document.getElementById('stat-rejected-docs').textContent = rejected;
+
+      filterHomeDocsList();
+    }
+
+    function filterHomeDocsList() {
+      const q = (document.getElementById('home-search-input').value || '').toLowerCase();
+      const grid = document.getElementById('home-recent-docs-grid');
+      if (!grid) return;
+
+      const filtered = allHomeDocs.filter(d => {
+        const idMatch = (d.id || '').toLowerCase().includes(q);
+        const nameMatch = (d.docName || '').toLowerCase().includes(q);
+        const statusMatch = (d.status || '').toLowerCase().includes(q);
+        return idMatch || nameMatch || statusMatch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+            Belum ada dokumen yang sesuai. Klik <b>"Buat Dokumen Persetujuan Baru"</b> untuk memulai.
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(d => {
+        const status = d.status || 'PENDING';
+        let badgeClass = 'status-badge status-badge--pending';
+        let statusText = 'MENUNGGU';
+        if (status === 'APPROVED') {
+          badgeClass = 'status-badge status-badge--approved';
+          statusText = 'DISETUJUI';
+        } else if (status === 'REJECTED') {
+          badgeClass = 'status-badge status-badge--rejected';
+          statusText = 'DITOLAK';
+        }
+
+        const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(d.id)}`;
+
+        return `
+          <div class="doc-card">
+            <div>
+              <div class="doc-card-header">
+                <span class="doc-card-id">${d.id}</span>
+                <span class="${badgeClass}">${statusText}</span>
+              </div>
+              <div class="doc-card-title">${d.docName || 'Formulir Persetujuan Rilis'}</div>
+              <div class="doc-card-meta">
+                <span>📅 ${d.date || 'Terbaru'}</span>
+                <span>🔢 Ver: ${d.releaseVersion || '1.0'}</span>
+              </div>
+            </div>
+            <div class="doc-card-actions">
+              <button class="btn btn-sm btn-primary" style="flex:1;" onclick="openDocumentFromHome('${d.id}')">
+                📂 Buka Dokumen
+              </button>
+              <button class="btn btn-sm btn-secondary" title="Salin Tautan Share" onclick="copyShareUrlDirect('${shareUrl}', this)">
+                🔗 Link
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyShareUrlDirect(url, btnElem) {
+      navigator.clipboard.writeText(url).then(() => {
+        const origText = btnElem.textContent;
+        btnElem.textContent = '✓ Tersalin';
+        btnElem.style.borderColor = '#10b981';
+        setTimeout(() => {
+          btnElem.textContent = origText;
+          btnElem.style.borderColor = '';
+        }, 2000);
+      });
+    }
+
+    function scrollToDocumentsList() {
+      const elem = document.getElementById('documents-board-section');
+      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function showHomeView() {
+      document.getElementById('home-view').style.display = 'block';
+      document.getElementById('form-view').style.display = 'none';
+      document.getElementById('nav-btn-home').style.display = 'none';
+      
+      // Update URL to clean home path
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState(null, '', cleanUrl);
+
+      fetchAllDocumentsForHome();
+    }
+
+    function showFormView(docId) {
+      document.getElementById('home-view').style.display = 'none';
+      document.getElementById('form-view').style.display = 'block';
+      document.getElementById('nav-btn-home').style.display = 'inline-flex';
+
+      if (docId) {
+        currentDocId = docId;
+        const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(docId)}`;
+        window.history.replaceState(null, '', newUrl);
+        loadDocumentFromCloud(docId);
+      }
+    }
+
+    function openDocumentFromHome(docId) {
+      showFormView(docId);
+    }
+
+    function createNewDocument() {
+      const year = new Date().getFullYear();
+      const randomNum = Math.floor(100 + Math.random() * 900);
+      const newId = `QA-REL-${year}-${randomNum}`;
+      
+      // Reset form to blank draft state
+      docStatus = 'PENDING';
+      currentDocId = newId;
+      
+      // Open form view with new ID
+      showFormView(newId);
+
+      // Set input values
+      const idInput = document.getElementById('doc-number-input');
+      if (idInput) idInput.value = newId;
+
+      const nameInput = document.getElementById('doc-name-input');
+      if (nameInput) nameInput.value = 'Pengajuan Persetujuan Rilis Fitur Baru';
+
+      // Save initial blank draft
+      saveCurrentState();
+    }
+
+    // Dynamic listener for Document Number Input changes to keep URL and Supabase ID synced
+    document.addEventListener('DOMContentLoaded', function() {
+      const idInput = document.getElementById('doc-number-input');
+      if (idInput) {
+        idInput.addEventListener('change', function() {
+          const val = this.value.trim();
+          if (val && val !== currentDocId) {
+            console.log(`Document ID changed from ${currentDocId} to ${val}`);
+            currentDocId = val;
+            const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(val)}`;
+            window.history.replaceState(null, '', newUrl);
+            saveCurrentState();
+          }
+        });
+      }
+    });
+
+    // AUTO-NAVIGATE ON INITIAL LOAD BASED ON URL QUERY PARAMS
+    window.addEventListener('load', function() {
+      const params = new URLSearchParams(window.location.search);
+      const urlDocId = params.get('id');
+      if (urlDocId) {
+        showFormView(urlDocId);
+      } else {
+        showHomeView();
+      }
+    });
+
+  
