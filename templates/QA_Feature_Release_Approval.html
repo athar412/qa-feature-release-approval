@@ -1825,7 +1825,7 @@
               <td><span class="editable" contenteditable="true" data-placeholder="DD/MM/YYYY"></span></td>
             </tr>
           </tbody>
-        </table></div>
+                </table>
 
         <!-- Manager / Approver Decision Box -->
         <div id="approver-action-box" class="no-print mt-16" style="display:none; background:#f8fafc; border:1px solid var(--border); padding:18px; border-radius:8px;">
@@ -1863,10 +1863,9 @@
               <td><span class="editable" contenteditable="true" data-placeholder="Nama Penulis..."></span></td>
             </tr>
           </tbody>
-        </table></div>
+        </table>
       </div>
     </div>
-
   </div> <!-- /page-container -->
 
   <!-- LOGIN MODAL -->
@@ -1967,8 +1966,8 @@
     // ================================================================
     //  SUPABASE DATABASE INTEGRATION (WITH TRANSPARENT LOCAL STORAGE FALLBACK)
     // ================================================================
-    const SUPABASE_URL = 'https://YOUR_PROJECT_ID.supabase.co';
-    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+    const SUPABASE_URL = 'https://crutsnnddasqbzdymjfs.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydXRzbm5kZGFzcWJ6ZHltamZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NzU2MzUsImV4cCI6MjEwMDM1MTYzNX0.KN1jmW7axzbjz1QD3NSZwEKiEiHmiguQzim9w5UrEU0';
     
     let supabaseClient = null;
     try {
@@ -2066,7 +2065,13 @@
       if (!currentUser) return;
       document.getElementById('login-modal').style.display = 'none';
       const navDisplay = document.getElementById('nav-user-display');
-      navDisplay.textContent = `Pengguna: ${currentUser.title}`;
+      if (navDisplay) {
+        navDisplay.textContent = `Pengguna: ${currentUser.title}`;
+      }
+      const mobDisplay = document.getElementById('mobile-user-display');
+      if (mobDisplay) {
+        mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
+      }
 
       if (docStatus === 'APPROVED') {
         lockDocumentUI();
@@ -3057,17 +3062,7 @@ ${shareUrl}`);
       }
     }
 
-    // Sync user login title to mobile display
-    const originalApplyAuthUI = applyAuthUI;
-    applyAuthUI = function() {
-      if (typeof originalApplyAuthUI === 'function') {
-        originalApplyAuthUI();
-      }
-      const mobDisplay = document.getElementById('mobile-user-display');
-      if (mobDisplay && currentUser) {
-        mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
-      }
-    };
+
 
   </script>
 
