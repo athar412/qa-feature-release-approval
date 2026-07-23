@@ -692,9 +692,21 @@ ${shareUrl}`);
     }
 
     // MANAGER / PO APPROVAL & REJECTION RULE
+    
+    // ================================================================
+    //  MANAGER APPROVAL & REJECTION ACTIONS (UNIFIED BINDING)
+    // ================================================================
+    function approveDocumentAction() {
+      approveRelease();
+    }
+
+    function rejectDocumentAction() {
+      rejectRelease();
+    }
+
     function approveRelease() {
       if (!currentUser) {
-        alert("Silakan login sebagai Product Owner / Manager untuk memberikan persetujuan.");
+        alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
         return;
       }
@@ -725,7 +737,7 @@ ${shareUrl}`);
 
     function rejectRelease() {
       if (!currentUser) {
-        alert("Silakan login sebagai Product Owner / Manager untuk menolak rilis.");
+        alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
         return;
       }
