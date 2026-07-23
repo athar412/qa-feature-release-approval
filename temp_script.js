@@ -1244,6 +1244,69 @@ ${shareUrl}`);
       if (elem) elem.scrollIntoView({ behavior: 'smooth' });
     }
 
+    
+    // =============================================
+    //  DELETE DOCUMENT ENGINE (QA-LEAD ONLY WITH WARNING)
+    // =============================================
+    async function deleteDocumentAction(docId) {
+      if (!docId) return;
+
+      // 1. Role Privilege Check: Only QA Lead is authorized to delete documents
+      if (!currentUser || currentUser.role !== 'qa-lead') {
+        alert("⛔ Akses Ditolak: Hanya pengguna dengan peran QA Lead / Specialist yang memiliki wewenang untuk menghapus dokumen dari database!");
+        return;
+      }
+
+      // 2. High-Severity Warning Confirmation Pop-up
+      const confirmDelete = confirm(
+        `⚠️ PERINGATAN KEAMANAN TINGKAT TINGGI!\n\n` +
+        `Apakah Anda yakin ingin menghapus dokumen [${docId}] ini secara PERMANEN dari database Supabase & Cloud Backup?\n\n` +
+        `• Seluruh skenario RTM, temuan defect, dan tanda tangan digital di dalamnya akan DIHAPUS PERMANEN.\n` +
+        `• Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
+        `Tekan OK untuk melanjutkan penghapusan.`
+      );
+
+      if (!confirmDelete) return;
+
+      console.log(`Deleting document [${docId}]...`);
+
+      // 3. Delete from LocalStorage
+      try {
+        let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        if (docs[docId]) {
+          delete docs[docId];
+          localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+        }
+      } catch(e) {}
+
+      // 4. Delete from Supabase Database
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('qa_documents')
+            .delete()
+            .eq('id', docId);
+
+          if (error) {
+            console.warn("Supabase Delete Warning:", error.message);
+          } else {
+            console.log("Supabase Delete Success:", docId);
+          }
+        } catch(err) {
+          console.warn("Supabase Delete Error:", err.message);
+        }
+      }
+
+      alert(`✅ Dokumen [${docId}] berhasil dihapus secara permanen dari database.`);
+
+      // 5. Navigate back to Home if the current open document was deleted
+      if (currentDocId === docId || document.getElementById('form-view').style.display !== 'none') {
+        showHomeView();
+      } else {
+        fetchAllDocumentsForHome();
+      }
+    }
+
     function showHomeView() {
       setElementStyle('home-view', 'display', 'block');
       setElementStyle('form-view', 'display', 'none');

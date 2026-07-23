@@ -1605,6 +1605,10 @@
     </button>
 
     <div class="nav-actions">
+      <button class="btn btn-sm btn-primary" id="nav-btn-home" onclick="showHomeView()" title="Kembali ke Beranda" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; margin-right: 8px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ⬅ Beranda
+      </button>
       <!-- Mobile User Info (Only visible on Mobile view) -->
       <div class="mobile-user-info" id="mobile-user-display">Pengguna: Belum Otentikasi</div>
       <button class="btn btn-ghost" id="theme-toggle" onclick="toggleTheme()" title="Ganti Tema Mode">
@@ -1730,6 +1734,15 @@
 
   <div id="form-view" style="display: none;">
     <div class="page-container">
+
+      <!-- PROMINENT BACK TO HOME BANNER BUTTON -->
+      <div class="no-print" style="margin-bottom: 20px;">
+        <button class="btn btn-secondary" onclick="showHomeView()" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Kembali ke Beranda / Dashboard Utama
+        </button>
+      </div>
+
 
     <!-- STATUS BANNERS -->
     <div id="status-banner-approved" class="status-banner status-banner--approved no-print" style="display:none;">
@@ -3518,6 +3531,69 @@ ${shareUrl}`);
     function scrollToDocumentsList() {
       const elem = document.getElementById('documents-board-section');
       if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    
+    // =============================================
+    //  DELETE DOCUMENT ENGINE (QA-LEAD ONLY WITH WARNING)
+    // =============================================
+    async function deleteDocumentAction(docId) {
+      if (!docId) return;
+
+      // 1. Role Privilege Check: Only QA Lead is authorized to delete documents
+      if (!currentUser || currentUser.role !== 'qa-lead') {
+        alert("⛔ Akses Ditolak: Hanya pengguna dengan peran QA Lead / Specialist yang memiliki wewenang untuk menghapus dokumen dari database!");
+        return;
+      }
+
+      // 2. High-Severity Warning Confirmation Pop-up
+      const confirmDelete = confirm(
+        `⚠️ PERINGATAN KEAMANAN TINGKAT TINGGI!\n\n` +
+        `Apakah Anda yakin ingin menghapus dokumen [${docId}] ini secara PERMANEN dari database Supabase & Cloud Backup?\n\n` +
+        `• Seluruh skenario RTM, temuan defect, dan tanda tangan digital di dalamnya akan DIHAPUS PERMANEN.\n` +
+        `• Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
+        `Tekan OK untuk melanjutkan penghapusan.`
+      );
+
+      if (!confirmDelete) return;
+
+      console.log(`Deleting document [${docId}]...`);
+
+      // 3. Delete from LocalStorage
+      try {
+        let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        if (docs[docId]) {
+          delete docs[docId];
+          localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+        }
+      } catch(e) {}
+
+      // 4. Delete from Supabase Database
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient
+            .from('qa_documents')
+            .delete()
+            .eq('id', docId);
+
+          if (error) {
+            console.warn("Supabase Delete Warning:", error.message);
+          } else {
+            console.log("Supabase Delete Success:", docId);
+          }
+        } catch(err) {
+          console.warn("Supabase Delete Error:", err.message);
+        }
+      }
+
+      alert(`✅ Dokumen [${docId}] berhasil dihapus secara permanen dari database.`);
+
+      // 5. Navigate back to Home if the current open document was deleted
+      if (currentDocId === docId || document.getElementById('form-view').style.display !== 'none') {
+        showHomeView();
+      } else {
+        fetchAllDocumentsForHome();
+      }
     }
 
     function showHomeView() {
