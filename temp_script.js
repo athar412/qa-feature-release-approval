@@ -1,4 +1,11 @@
 
+
+    // SAFE DEFENSIVE STYLE HELPER
+    function setElementStyle(id, prop, val) {
+      const el = document.getElementById(id);
+      if (el) el.style[prop] = val;
+    }
+
     // ================================================================
     //  SUPABASE DATABASE INTEGRATION (WITH TRANSPARENT LOCAL STORAGE FALLBACK)
     // ================================================================
@@ -58,7 +65,7 @@
         currentUser = JSON.parse(savedUserStr);
         applyAuthUI();
       } else {
-        document.getElementById('login-modal').style.display = 'flex';
+        setElementStyle('login-modal', 'display', 'flex');
       }
     }
 
@@ -71,7 +78,7 @@
         currentUser = { username: u, ...HARDCODED_USERS[u] };
         localStorage.setItem('holycat_qa_user', JSON.stringify(currentUser));
         err.style.display = 'none';
-        document.getElementById('login-modal').style.display = 'none';
+        setElementStyle('login-modal', 'display', 'none');
         applyAuthUI();
       } else {
         err.style.display = 'block';
@@ -99,7 +106,7 @@
 
     function applyAuthUI() {
       if (!currentUser) return;
-      document.getElementById('login-modal').style.display = 'none';
+      setElementStyle('login-modal', 'display', 'none');
       const navDisplay = document.getElementById('nav-user-display');
       if (navDisplay) {
         navDisplay.textContent = `Pengguna: ${currentUser.title}`;
@@ -116,10 +123,10 @@
       }
 
       // Hide all signature buttons initially
-      document.getElementById('btn-sig-qa-lead').style.display = 'none';
-      document.getElementById('btn-sig-tech-lead').style.display = 'none';
-      document.getElementById('btn-sig-product-owner').style.display = 'none';
-      document.getElementById('approver-action-box').style.display = 'none';
+      setElementStyle('btn-sig-qa-lead', 'display', 'none');
+      setElementStyle('btn-sig-tech-lead', 'display', 'none');
+      setElementStyle('btn-sig-product-owner', 'display', 'none');
+      setElementStyle('approver-action-box', 'display', 'none');
 
       // ROLE PRIVILEGE RULES:
       if (currentUser.role === 'qa-lead') {
@@ -127,22 +134,22 @@
         setGeneralEditable(true);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(true);
-        document.getElementById('btn-sig-qa-lead').style.display = 'inline-flex';
+        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
       } 
       else if (currentUser.role === 'tech-lead') {
         // Tech Lead: Read-only for general fields, can ONLY sign Tech Lead row
         setGeneralEditable(false);
         setKnownIssuesEditable(false);
         setAddButtonsVisible(false);
-        document.getElementById('btn-sig-tech-lead').style.display = 'inline-flex';
+        setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
       } 
       else if (currentUser.role === 'product-owner') {
         // Product Manager: Read-only for general fields, CAN EDIT Seksi 8 (Known Issues), sign Manager row, and Approve/Reject
         setGeneralEditable(false);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(false);
-        document.getElementById('btn-sig-product-owner').style.display = 'inline-flex';
-        document.getElementById('approver-action-box').style.display = 'block';
+        setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+        setElementStyle('approver-action-box', 'display', 'block');
       }
 
       updateStatusBanners();
@@ -174,18 +181,18 @@
     }
 
     function updateStatusBanners() {
-      document.getElementById('status-banner-pending').style.display = 'none';
-      document.getElementById('status-banner-approved').style.display = 'none';
-      document.getElementById('status-banner-rejected').style.display = 'none';
+      setElementStyle('status-banner-pending', 'display', 'none');
+      setElementStyle('status-banner-approved', 'display', 'none');
+      setElementStyle('status-banner-rejected', 'display', 'none');
 
       if (docStatus === 'APPROVED') {
-        document.getElementById('status-banner-approved').style.display = 'flex';
+        setElementStyle('status-banner-approved', 'display', 'flex');
         lockDocumentUI();
       } else if (docStatus === 'REJECTED') {
-        document.getElementById('status-banner-rejected').style.display = 'flex';
+        setElementStyle('status-banner-rejected', 'display', 'flex');
         document.getElementById('rejection-reason-text').textContent = 'Catatan: ' + (rejectionReason || 'Ditolak untuk revisi');
       } else {
-        document.getElementById('status-banner-pending').style.display = 'flex';
+        setElementStyle('status-banner-pending', 'display', 'flex');
       }
     }
 
@@ -448,8 +455,8 @@
     }
 
     function lockDocumentUI() {
-      document.getElementById('btn-save-doc').style.display = 'none';
-      document.getElementById('approver-action-box').style.display = 'none';
+      setElementStyle('btn-save-doc', 'display', 'none');
+      setElementStyle('approver-action-box', 'display', 'none');
       
       document.querySelectorAll('.btn-sig-trigger, .add-evidence-btn, input[type="file"]').forEach(el => {
         el.style.display = 'none';
@@ -474,7 +481,7 @@ ${shareUrl}`);
     }
 
     function openHistoryModal() {
-      document.getElementById('history-modal').style.display = 'flex';
+      setElementStyle('history-modal', 'display', 'flex');
       renderHistoryTable();
     }
 
@@ -525,7 +532,7 @@ ${shareUrl}`);
     }
 
     function closeHistoryModal() {
-      document.getElementById('history-modal').style.display = 'none';
+      setElementStyle('history-modal', 'display', 'none');
     }
 
     // =============================================
@@ -588,12 +595,12 @@ ${shareUrl}`);
     function openSignatureModal(role) {
       if (docStatus === 'APPROVED') return;
       activeSignatureRole = role;
-      document.getElementById('signature-modal').style.display = 'flex';
+      setElementStyle('signature-modal', 'display', 'flex');
       setTimeout(initSignatureCanvas, 100);
     }
 
     function closeSignatureModal() {
-      document.getElementById('signature-modal').style.display = 'none';
+      setElementStyle('signature-modal', 'display', 'none');
       clearSignatureCanvas();
     }
 
@@ -753,7 +760,7 @@ ${shareUrl}`);
       if (rate > 100) rate = 100;
       
       document.getElementById('pass-rate').textContent = rate + '%';
-      document.getElementById('pass-rate-fill').style.width = rate + '%';
+      setElementStyle('pass-rate-fill', 'width', rate + '%');
     }
 
     document.querySelectorAll('.metric-value').forEach(el => {
@@ -978,12 +985,12 @@ ${shareUrl}`);
     function showHistoryPopover() {
       if (popoverTimeout) clearTimeout(popoverTimeout);
       renderHistoryPopoverList();
-      document.getElementById('history-popover').style.display = 'flex';
+      setElementStyle('history-popover', 'display', 'flex');
     }
 
     function hideHistoryPopover() {
       popoverTimeout = setTimeout(() => {
-        document.getElementById('history-popover').style.display = 'none';
+        setElementStyle('history-popover', 'display', 'none');
       }, 200);
     }
 
@@ -1012,7 +1019,7 @@ ${shareUrl}`);
         item.onclick = (e) => {
           e.stopPropagation();
           loadDocument(doc.id);
-          document.getElementById('history-popover').style.display = 'none';
+          setElementStyle('history-popover', 'display', 'none');
         };
 
         const statusClass = doc.status === 'APPROVED' ? 'status--pass' : (doc.status === 'REJECTED' ? 'status--fail' : 'status--pending');
@@ -1043,7 +1050,7 @@ ${shareUrl}`);
       const isVisible = popover.style.display === 'flex';
       
       // Close other popovers
-      document.getElementById('history-popover').style.display = 'none';
+      setElementStyle('history-popover', 'display', 'none');
 
       if (isVisible) {
         popover.style.display = 'none';
@@ -1238,9 +1245,9 @@ ${shareUrl}`);
     }
 
     function showHomeView() {
-      document.getElementById('home-view').style.display = 'block';
-      document.getElementById('form-view').style.display = 'none';
-      document.getElementById('nav-btn-home').style.display = 'none';
+      setElementStyle('home-view', 'display', 'block');
+      setElementStyle('form-view', 'display', 'none');
+      setElementStyle('nav-btn-home', 'display', 'none');
       
       // Update URL to clean home path
       const cleanUrl = window.location.origin + window.location.pathname;
@@ -1250,9 +1257,9 @@ ${shareUrl}`);
     }
 
     function showFormView(docId) {
-      document.getElementById('home-view').style.display = 'none';
-      document.getElementById('form-view').style.display = 'block';
-      document.getElementById('nav-btn-home').style.display = 'inline-flex';
+      setElementStyle('home-view', 'display', 'none');
+      setElementStyle('form-view', 'display', 'block');
+      setElementStyle('nav-btn-home', 'display', 'inline-flex');
 
       if (docId) {
         currentDocId = docId;
