@@ -64,60 +64,70 @@
     let rejectionReason = '';
     let activeSignatureRole = null;
 
-    function checkAuth() {
-      setElementStyle('login-modal', 'display', 'none');
+        function checkAuth() {
       const savedUserStr = localStorage.getItem('holycat_qa_user');
       if (savedUserStr) {
         try {
           currentUser = JSON.parse(savedUserStr);
           applyAuthUI();
+          return;
         } catch (e) {
           currentUser = null;
         }
       }
-    }
-
-    function processLogin() {
-      const u = document.getElementById('login-username').value.trim();
-      const p = document.getElementById('login-password').value.trim();
-      const err = document.getElementById('login-error');
-
-      if (HARDCODED_USERS[u] && HARDCODED_USERS[u].pass === p) {
-        currentUser = { username: u, ...HARDCODED_USERS[u] };
-        localStorage.setItem('holycat_qa_user', JSON.stringify(currentUser));
-        err.style.display = 'none';
-        setElementStyle('login-modal', 'display', 'none');
-        applyAuthUI();
-      } else {
-        err.style.display = 'block';
+      
+      // Guest / Unauthenticated State: Lock access with login modal
+      currentUser = null;
+      setElementStyle('login-modal', 'display', 'flex');
+      
+      const authBtn = document.getElementById('nav-btn-auth');
+      if (authBtn) {
+        authBtn.className = 'btn btn-sm btn-primary';
+        authBtn.innerHTML = '🔑 Masuk / Login';
+        authBtn.onclick = function() { setElementStyle('login-modal', 'display', 'flex'); };
       }
+
+      const navDisplay = document.getElementById('nav-user-display');
+      if (navDisplay) navDisplay.textContent = 'Pengguna: Belum Login';
+      const mobDisplay = document.getElementById('mobile-user-display');
+      if (mobDisplay) mobDisplay.textContent = 'Pengguna: Belum Login';
     }
 
-     
-
-    function logoutUser() {
-      localStorage.removeItem('holycat_qa_user');
-      location.reload();
+    function handleAuthClick() {
+      if (currentUser) {
+        logoutUser();
+      } else {
+        setElementStyle('login-modal', 'display', 'flex');
+      }
     }
 
     function applyAuthUI() {
-      if (!currentUser) return;
+      if (!currentUser) {
+        checkAuth();
+        return;
+      }
       setElementStyle('login-modal', 'display', 'none');
+
+      // Update Auth button in navbar to Logout state
+      const authBtn = document.getElementById('nav-btn-auth');
+      if (authBtn) {
+        authBtn.className = 'btn btn-sm btn-danger';
+        authBtn.innerHTML = '🚪 Keluar / Logout';
+        authBtn.onclick = logoutUser;
+      }
+
       const navDisplay = document.getElementById('nav-user-display');
-      if (navDisplay) {
-        navDisplay.textContent = `Pengguna: ${currentUser.title}`;
-      }
+      if (navDisplay) navDisplay.textContent = `Pengguna: ${currentUser.title}`;
       const mobDisplay = document.getElementById('mobile-user-display');
-      if (mobDisplay) {
-        mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
-      }
+      if (mobDisplay) mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
 
       // STRICT VIEW CONTROL FOR NAVBAR ACTION BUTTONS
       const homeViewEl = document.getElementById('home-view');
       const isHomeActive = homeViewEl && homeViewEl.style.display !== 'none';
       if (isHomeActive) {
         setElementStyle('btn-save-doc', 'display', 'none');
-        setElementStyle('btn-print-doc', 'display', 'none');
+        const printBtn = document.getElementById('btn-print-doc');
+        if (printBtn) printBtn.style.setProperty('display', 'none', 'important');
         const shareWrap = document.querySelector('.share-popover-wrapper');
         if (shareWrap) shareWrap.style.display = 'none';
       }
@@ -156,14 +166,6 @@
       }
 
       updateStatusBanners();
-
-      // Enforce navbar button hidden state if on Home View
-      if (isHomeActive) {
-        setElementStyle('btn-save-doc', 'display', 'none');
-        setElementStyle('btn-print-doc', 'display', 'none');
-        const shareWrap = document.querySelector('.share-popover-wrapper');
-        if (shareWrap) shareWrap.style.display = 'none';
-      }
     }
 
     function setGeneralEditable(enable) {
