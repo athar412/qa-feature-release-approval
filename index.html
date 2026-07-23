@@ -2902,6 +2902,235 @@
     }
 
 
+    
+    // ================================================================
+    //  RTM TABLE ROW MANAGEMENT
+    // ================================================================
+    function addRtmRow() {
+      const table = document.getElementById('rtm-table');
+      if (!table) return;
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="editable" contenteditable="true" data-placeholder="REQ-${String(rowCount).padStart(3,'0')}">REQ-${String(rowCount).padStart(3,'0')}</span></td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi kebutuhan..."></span></td>
+        <td><span class="editable" contenteditable="true" data-placeholder="TC-${String(rowCount).padStart(3,'0')}">TC-${String(rowCount).padStart(3,'0')}</span></td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Manual">Manual</span></td>
+        <td class="center">
+          <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+            <option value="Pass" selected>Pass</option>
+            <option value="Fail">Fail</option>
+            <option value="N/A">N/A</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // ================================================================
+    //  DEFECT TABLE ROW MANAGEMENT
+    // ================================================================
+    function addDefectRow() {
+      const table = document.getElementById('defect-table');
+      if (!table) return;
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="editable" contenteditable="true" data-placeholder="BUG-${String(rowCount).padStart(3,'0')}">BUG-${String(rowCount).padStart(3,'0')}</span></td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi bug..."></span></td>
+        <td class="center">
+          <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High" selected>High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </td>
+        <td class="center">
+          <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+            <option value="Open" selected>Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Closed">Closed</option>
+            <option value="Won\'t Fix">Won\'t Fix</option>
+          </select>
+        </td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Assignee..."></span></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // ================================================================
+    //  EVIDENCE SCREENSHOT CARD MANAGEMENT
+    // ================================================================
+    function addEvidenceCard() {
+      const grid = document.getElementById('evidence-grid');
+      if (!grid) return;
+      const cardCount = grid.querySelectorAll('.evidence-card').length + 1;
+      const card = document.createElement('div');
+      card.className = 'evidence-card';
+      card.innerHTML = `
+        <div class="evidence-img-area">
+          <span class="upload-text">Upload Screenshot</span>
+          <input type="file" accept="image/*" onchange="previewEvidence(event, this)" />
+        </div>
+        <div class="evidence-meta">
+          <div class="evidence-id" contenteditable="true" data-placeholder="TC-${String(cardCount).padStart(3,'0')}">TC-${String(cardCount).padStart(3,'0')}</div>
+          <div class="evidence-desc" contenteditable="true" data-placeholder="Keterangan screenshot...">Keterangan screenshot...</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+
+    function previewEvidence(event, inputEl) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const imgArea = inputEl.closest('.evidence-img-area');
+        if (imgArea) {
+          const uploadText = imgArea.querySelector('.upload-text');
+          if (uploadText) uploadText.style.display = 'none';
+          
+          let img = imgArea.querySelector('img');
+          if (!img) {
+            img = document.createElement('img');
+            img.style.cssText = 'width:100%; height:auto; max-height:180px; object-fit:cover; display:block;';
+            imgArea.insertBefore(img, imgArea.firstChild);
+          }
+          img.src = e.target.result;
+          img.alt = file.name;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ================================================================
+    //  SIGNATURE CANVAS MODAL & DRAWING ENGINE
+    // ================================================================
+    let currentSigRole = null;
+    let sigCanvas = null;
+    let sigCtx = null;
+    let sigDrawing = false;
+
+    function openSignatureModal(role) {
+      currentSigRole = role;
+      const modal = document.getElementById('signature-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+      sigCanvas = document.getElementById('signature-canvas');
+      if (sigCanvas) {
+        sigCtx = sigCanvas.getContext('2d');
+        sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+        sigCtx.strokeStyle = '#1a1a2e';
+        sigCtx.lineWidth = 2.5;
+        sigCtx.lineCap = 'round';
+        sigCtx.lineJoin = 'round';
+
+        // Remove old listeners to prevent duplicates
+        sigCanvas.onmousedown = function(e) {
+          sigDrawing = true;
+          sigCtx.beginPath();
+          const rect = sigCanvas.getBoundingClientRect();
+          sigCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        };
+        sigCanvas.onmousemove = function(e) {
+          if (!sigDrawing) return;
+          const rect = sigCanvas.getBoundingClientRect();
+          sigCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+          sigCtx.stroke();
+        };
+        sigCanvas.onmouseup = function() { sigDrawing = false; };
+        sigCanvas.onmouseleave = function() { sigDrawing = false; };
+
+        // Touch support for mobile
+        sigCanvas.ontouchstart = function(e) {
+          e.preventDefault();
+          sigDrawing = true;
+          sigCtx.beginPath();
+          const rect = sigCanvas.getBoundingClientRect();
+          const touch = e.touches[0];
+          sigCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+        };
+        sigCanvas.ontouchmove = function(e) {
+          e.preventDefault();
+          if (!sigDrawing) return;
+          const rect = sigCanvas.getBoundingClientRect();
+          const touch = e.touches[0];
+          sigCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+          sigCtx.stroke();
+        };
+        sigCanvas.ontouchend = function() { sigDrawing = false; };
+      }
+    }
+
+    function clearSignatureCanvas() {
+      if (sigCanvas && sigCtx) {
+        sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      }
+    }
+
+    function closeSignatureModal() {
+      const modal = document.getElementById('signature-modal');
+      if (modal) modal.style.display = 'none';
+      currentSigRole = null;
+    }
+
+    function applySignature() {
+      if (!sigCanvas || !currentSigRole) return;
+      const dataUrl = sigCanvas.toDataURL('image/png');
+      
+      // Check if canvas is blank
+      const blankCanvas = document.createElement('canvas');
+      blankCanvas.width = sigCanvas.width;
+      blankCanvas.height = sigCanvas.height;
+      if (dataUrl === blankCanvas.toDataURL('image/png')) {
+        alert('Silakan gambar tanda tangan terlebih dahulu sebelum menerapkan.');
+        return;
+      }
+
+      const container = document.getElementById('sig-container-' + currentSigRole);
+      if (container) {
+        container.innerHTML = '<img src="' + dataUrl + '" class="signoff-img" alt="Tanda Tangan ' + currentSigRole + '" style="max-height:80px; width:auto;" />';
+      }
+
+      // Store signature data
+      if (!window._signoffs) window._signoffs = {};
+      window._signoffs[currentSigRole] = dataUrl;
+
+      closeSignatureModal();
+    }
+
+    // Handle file upload for signature
+    document.addEventListener('DOMContentLoaded', function() {
+      const sigFileInputs = document.querySelectorAll('#signature-modal input[type="file"]');
+      sigFileInputs.forEach(function(input) {
+        input.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            if (sigCanvas && sigCtx) {
+              const img = new Image();
+              img.onload = function() {
+                sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+                const scale = Math.min(sigCanvas.width / img.width, sigCanvas.height / img.height);
+                const x = (sigCanvas.width - img.width * scale) / 2;
+                const y = (sigCanvas.height - img.height * scale) / 2;
+                sigCtx.drawImage(img, x, y, img.width * scale, img.height * scale);
+              };
+              img.src = ev.target.result;
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+    });
+
     function saveDocument() {
       if (!currentUser) { alert('Silakan login terlebih dahulu.'); return; }
       const state = getFormState();
