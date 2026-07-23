@@ -2702,15 +2702,21 @@
       updateStatusBanners();
     }
 
+    
+    // ================================================================
+    //  DYNAMIC FORM ROWS & EDITABILITY INTERACTIVITY ENGINE
+    // ================================================================
     function setGeneralEditable(enable) {
-      document.querySelectorAll('[contenteditable="true"], .editable-area, .doc-control-value, .editable').forEach(el => {
-        // Skip Known Issues area if handled separately
+      document.querySelectorAll('[contenteditable], .editable-area, .doc-control-value, .editable').forEach(el => {
         if (el.closest('#section-known-issues')) return;
-        el.setAttribute('contenteditable', enable ? 'true' : 'false');
-      });
-
-      document.querySelectorAll('input[type="radio"]').forEach(el => {
-        el.disabled = !enable;
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+          el.disabled = !enable;
+          if (enable) el.removeAttribute('readonly');
+          else el.setAttribute('readonly', 'readonly');
+        } else {
+          el.setAttribute('contenteditable', enable ? 'true' : 'false');
+          el.style.pointerEvents = enable ? 'auto' : 'none';
+        }
       });
     }
 
@@ -2718,14 +2724,97 @@
       const knownArea = document.getElementById('known-issues-area');
       if (knownArea) {
         knownArea.setAttribute('contenteditable', enable ? 'true' : 'false');
+        knownArea.style.pointerEvents = enable ? 'auto' : 'none';
       }
+      document.querySelectorAll('#known-issues-table input, #known-issues-table textarea, #known-issues-table [contenteditable]').forEach(el => {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.disabled = !enable;
+        } else {
+          el.setAttribute('contenteditable', enable ? 'true' : 'false');
+          el.style.pointerEvents = enable ? 'auto' : 'none';
+        }
+      });
     }
 
     function setAddButtonsVisible(visible) {
-      document.querySelectorAll('.add-evidence-btn, .flowchart-area input[type="file"], .evidence-card input[type="file"]').forEach(el => {
+      document.querySelectorAll('.add-evidence-btn, .btn-add-row, .btn-remove-row, .flowchart-area input[type="file"], .evidence-card input[type="file"]').forEach(el => {
         el.style.display = visible ? 'inline-flex' : 'none';
       });
     }
+
+    function addTestCaseRow() {
+      const tbody = document.getElementById('test-cases-table-body') || document.querySelector('#section-test-cases tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="editable" contenteditable="true">TC-${String(rowCount).padStart(3, '0')}</span></td>
+        <td><span class="editable" contenteditable="true">Uji skenario fitur baru...</span></td>
+        <td>
+          <select class="form-control form-control-sm doc-control-value" style="width: auto; padding: 2px 6px;">
+            <option value="PASSED" selected>PASSED</option>
+            <option value="FAILED">FAILED</option>
+            <option value="SKIPPED">SKIPPED</option>
+          </select>
+        </td>
+        <td><span class="editable" contenteditable="true">Hasil pengujian sesuai ekspektasi</span></td>
+        <td><button class="btn btn-ghost btn-sm text-danger no-print" onclick="deleteTestCaseRow(this)" title="Hapus Baris">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function deleteTestCaseRow(btn) {
+      const tr = btn.closest('tr');
+      if (tr) tr.remove();
+    }
+
+    function addKnownIssueRow() {
+      const tbody = document.getElementById('known-issues-table-body') || document.querySelector('#section-known-issues tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="editable" contenteditable="true">ISSUE-${String(rowCount).padStart(3, '0')}</span></td>
+        <td><span class="editable" contenteditable="true">Deskripsi catatan kendala / bug minor...</span></td>
+        <td>
+          <select class="form-control form-control-sm doc-control-value" style="width: auto; padding: 2px 6px;">
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM" selected>MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+          </select>
+        </td>
+        <td><span class="editable" contenteditable="true">Akan diperbaiki pada sprint berikutnya</span></td>
+        <td><button class="btn btn-ghost btn-sm text-danger no-print" onclick="deleteKnownIssueRow(this)" title="Hapus Baris">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function deleteKnownIssueRow(btn) {
+      const tr = btn.closest('tr');
+      if (tr) tr.remove();
+    }
+
+    function addRevisionRow() {
+      const tbody = document.getElementById('revision-history-table-body') || document.querySelector('#section-revisions tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      const today = new Date().toLocaleDateString('id-ID');
+      tr.innerHTML = `
+        <td><span class="editable" contenteditable="true">v1.${rowCount}</span></td>
+        <td><span class="editable" contenteditable="true">${today}</span></td>
+        <td><span class="editable" contenteditable="true">Pembaruan dokumen dan penyesuaian catatan</span></td>
+        <td><span class="editable" contenteditable="true">${currentUser ? currentUser.name : 'QA Lead'}</span></td>
+        <td><button class="btn btn-ghost btn-sm text-danger no-print" onclick="deleteRevisionRow(this)" title="Hapus Baris">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function deleteRevisionRow(btn) {
+      const tr = btn.closest('tr');
+      if (tr) tr.remove();
+    }
+
 
     function updateStatusBanners() {
       setElementStyle('status-banner-pending', 'display', 'none');
