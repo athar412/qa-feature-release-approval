@@ -109,6 +109,16 @@
         mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
       }
 
+      // STRICT VIEW CONTROL FOR NAVBAR ACTION BUTTONS
+      const homeViewEl = document.getElementById('home-view');
+      const isHomeActive = homeViewEl && homeViewEl.style.display !== 'none';
+      if (isHomeActive) {
+        setElementStyle('btn-save-doc', 'display', 'none');
+        setElementStyle('btn-print-doc', 'display', 'none');
+        const shareWrap = document.querySelector('.share-popover-wrapper');
+        if (shareWrap) shareWrap.style.display = 'none';
+      }
+
       if (docStatus === 'APPROVED') {
         lockDocumentUI();
         updateStatusBanners();
@@ -123,21 +133,18 @@
 
       // ROLE PRIVILEGE RULES:
       if (currentUser.role === 'qa-lead') {
-        // QA Lead: Full edit access to general fields, can only sign QA Lead row
         setGeneralEditable(true);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(true);
         setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
-      } 
+      }
       else if (currentUser.role === 'tech-lead') {
-        // Tech Lead: Read-only for general fields, can ONLY sign Tech Lead row
         setGeneralEditable(false);
         setKnownIssuesEditable(false);
         setAddButtonsVisible(false);
         setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
-      } 
+      }
       else if (currentUser.role === 'product-owner') {
-        // Product Manager: Read-only for general fields, CAN EDIT Seksi 8 (Known Issues), sign Manager row, and Approve/Reject
         setGeneralEditable(false);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(false);
@@ -146,6 +153,14 @@
       }
 
       updateStatusBanners();
+
+      // Enforce navbar button hidden state if on Home View
+      if (isHomeActive) {
+        setElementStyle('btn-save-doc', 'display', 'none');
+        setElementStyle('btn-print-doc', 'display', 'none');
+        const shareWrap = document.querySelector('.share-popover-wrapper');
+        if (shareWrap) shareWrap.style.display = 'none';
+      }
     }
 
     function setGeneralEditable(enable) {
@@ -267,9 +282,9 @@
       if (!state || !state.id) return;
       
       // Save locally first
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      let docs = JSON.parse('{}' || '{}');
       docs[state.id] = state;
-      localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+      // localStorage docs bypassed);
 
       // Attempt to save to Supabase if client is active
       if (supabaseClient) {
@@ -314,7 +329,7 @@
       currentDocId = docId;
 
       // Check LocalStorage first for instant render
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      let docs = JSON.parse('{}' || '{}');
       if (docs[docId]) {
         renderLoadedDoc(docs[docId]);
       }
@@ -331,7 +346,7 @@
           if (!error && data && data.document_data) {
             const supabaseData = data.document_data;
             docs[docId] = supabaseData;
-            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            // localStorage docs bypassed);
             renderLoadedDoc(supabaseData);
             console.log('Document loaded successfully from Supabase!');
             return; // Skip KVDB if Supabase succeeded
@@ -350,7 +365,7 @@
           const cloudData = await response.json();
           if (cloudData && cloudData.id) {
             docs[docId] = cloudData;
-            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            // localStorage docs bypassed);
             renderLoadedDoc(cloudData);
             console.log('Document synced from Legacy Cloud DB!');
           }
@@ -478,51 +493,6 @@ ${shareUrl}`);
       renderHistoryTable();
     }
 
-    function renderHistoryTable() {
-      const tbody = document.getElementById('history-table-body');
-      const searchQuery = document.getElementById('history-search-input').value.toLowerCase().trim();
-      const statusFilter = document.getElementById('history-status-filter').value;
-      tbody.innerHTML = '';
-
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      const keys = Object.keys(docs);
-
-      let filteredKeys = keys.filter(k => {
-        const d = docs[k];
-        const textMatch = (d.id || '').toLowerCase().includes(searchQuery) ||
-                          (d.docName || '').toLowerCase().includes(searchQuery) ||
-                          (d.docDate || '').toLowerCase().includes(searchQuery);
-        
-        let statusMatch = true;
-        if (statusFilter === 'PENDING') statusMatch = (d.status === 'PENDING');
-        else if (statusFilter === 'APPROVED') statusMatch = (d.status === 'APPROVED');
-        else if (statusFilter === 'REJECTED') statusMatch = (d.status === 'REJECTED');
-
-        return textMatch && statusMatch;
-      });
-
-      if (filteredKeys.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="center">Tidak ada dokumen yang sesuai filter.</td></tr>';
-      } else {
-        filteredKeys.forEach(k => {
-          const d = docs[k];
-          const tr = document.createElement('tr');
-          
-          let statusBadge = '<span class="status status--pending">Menunggu Persetujuan</span>';
-          if (d.status === 'APPROVED') statusBadge = '<span class="status status--pass">Disetujui (Read-Only)</span>';
-          else if (d.status === 'REJECTED') statusBadge = '<span class="status status--fail">Ditolak</span>';
-
-          tr.innerHTML = `
-            <td><strong>${d.id}</strong></td>
-            <td>${d.docName || 'Formulir Persetujuan Rilis'}</td>
-            <td>${d.docDate || '-'}</td>
-            <td>${statusBadge}</td>
-            <td><button class="btn btn-sm btn-primary" onclick="loadDocument('${d.id}'); closeHistoryModal();">Buka</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-    }
 
     function closeHistoryModal() {
       setElementStyle('history-modal', 'display', 'none');
@@ -923,7 +893,7 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
       const currentYear = new Date().getFullYear();
       
       let maxSeq = 0;
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      let docs = JSON.parse('{}' || '{}');
       Object.keys(docs).forEach(id => {
         const match = id.match(/^[A-Z]+-REL-\d{4}-(\d+)$/);
         if (match) {
@@ -1013,7 +983,7 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
       const container = document.getElementById('popover-history-list');
       if (!container) return;
 
-      const docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      const docs = JSON.parse('{}' || '{}');
       const docIds = Object.keys(docs);
 
       if (docIds.length === 0) {
@@ -1131,7 +1101,7 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
       allHomeDocs = [];
       // 1. Fetch from LocalStorage
       try {
-        const localDocs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        const localDocs = JSON.parse('{}' || '{}');
         Object.values(localDocs).forEach(d => {
           if (d && d.id) allHomeDocs.push(d);
         });
@@ -1287,10 +1257,10 @@ Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang 
 
       // 3. Delete from LocalStorage
       try {
-        let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        let docs = JSON.parse('{}' || '{}');
         if (docs[docId]) {
           delete docs[docId];
-          localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+          // localStorage docs bypassed);
         }
       } catch(e) {}
 
