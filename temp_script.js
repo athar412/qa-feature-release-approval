@@ -85,19 +85,7 @@
       }
     }
 
-    function quickLogin(type) {
-      if (type === 'qa-lead') {
-        document.getElementById('login-username').value = 'qa.lead';
-        document.getElementById('login-password').value = 'qa2026!';
-      } else if (type === 'tech-lead') {
-        document.getElementById('login-username').value = 'tech.lead';
-        document.getElementById('login-password').value = 'tech2026!';
-      } else {
-        document.getElementById('login-username').value = 'manager.holycat';
-        document.getElementById('login-password').value = 'manager2026!';
-      }
-      processLogin();
-    }
+     
 
     function logoutUser() {
       localStorage.removeItem('holycat_qa_user');
@@ -592,11 +580,33 @@ ${shareUrl}`);
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    function openSignatureModal(role) {
-      if (docStatus === 'APPROVED') return;
+        function openSignatureModal(role) {
+      if (docStatus === 'APPROVED') {
+        alert('⛔ Dokumen ini telah disetujui secara formal (Read-Only) dan tidak dapat diubah lagi.');
+        return;
+      }
+      if (!currentUser) {
+        alert('🔐 Silakan masuk terlebih dahulu untuk melakukan penandatanganan.');
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+      
+      // Strict Role Privilege Check
+      if (currentUser.role !== role) {
+        const roleNames = {
+          'qa-lead': 'QA Lead / Specialist',
+          'tech-lead': 'Tech Lead / Principal Architect',
+          'product-owner': 'Product Manager / Owner'
+        };
+        alert(`⛔ Akses Ditolak: Anda sedang masuk sebagai [${currentUser.title}].
+
+Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang untuk menandatangani kolom ini.`);
+        return;
+      }
+
       activeSignatureRole = role;
       setElementStyle('signature-modal', 'display', 'flex');
-      setTimeout(initSignatureCanvas, 100);
+      initCanvas();
     }
 
     function closeSignatureModal() {
@@ -1307,10 +1317,16 @@ ${shareUrl}`);
       }
     }
 
-    function showHomeView() {
+        function showHomeView() {
       setElementStyle('home-view', 'display', 'block');
       setElementStyle('form-view', 'display', 'none');
       setElementStyle('nav-btn-home', 'display', 'none');
+      
+      // Hide document-specific navbar buttons on Home View
+      setElementStyle('btn-save-doc', 'display', 'none');
+      setElementStyle('btn-print-doc', 'display', 'none');
+      const shareWrap = document.querySelector('.share-popover-wrapper');
+      if (shareWrap) shareWrap.style.display = 'none';
       
       // Update URL to clean home path
       const cleanUrl = window.location.origin + window.location.pathname;
@@ -1324,9 +1340,15 @@ ${shareUrl}`);
       setElementStyle('form-view', 'display', 'block');
       setElementStyle('nav-btn-home', 'display', 'inline-flex');
 
+      // Show document-specific navbar buttons on Form View
+      setElementStyle('btn-save-doc', 'display', 'inline-flex');
+      setElementStyle('btn-print-doc', 'display', 'inline-flex');
+      const shareWrap = document.querySelector('.share-popover-wrapper');
+      if (shareWrap) shareWrap.style.display = 'inline-block';
+
       if (docId) {
         currentDocId = docId;
-        const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(docId)}`;
+        const newUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(docId);
         window.history.replaceState(null, '', newUrl);
         loadDocumentFromCloud(docId);
       }

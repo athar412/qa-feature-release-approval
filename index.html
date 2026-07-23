@@ -1581,6 +1581,138 @@
       border-top: 1px solid var(--border);
     }
 
+
+    /* HIGH CONTRAST LIGHT MODE STYLING FOR HERO & HOME DASHBOARD */
+    [data-theme="light"] .hero-section {
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    [data-theme="light"] .hero-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.02em !important;
+    }
+
+    [data-theme="light"] .hero-subtitle {
+      color: #334155 !important;
+      font-weight: 500 !important;
+      font-size: 15px !important;
+      line-height: 1.6 !important;
+    }
+
+    /* HERO BUTTONS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .btn-hero-primary {
+      background-color: #4338ca !important;
+      color: #ffffff !important;
+      border: 1px solid #3730a3 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(67, 56, 202, 0.35) !important;
+    }
+    [data-theme="light"] .btn-hero-primary:hover {
+      background-color: #3730a3 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="light"] .btn-hero-secondary {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border: 2px solid #94a3b8 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    }
+    [data-theme="light"] .btn-hero-secondary:hover {
+      background-color: #f1f5f9 !important;
+      color: #0284c7 !important;
+      border-color: #0284c7 !important;
+    }
+
+    /* STAT CARDS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .stat-card {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .stat-number {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    [data-theme="light"] .stat-label {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+
+    /* DOC CARDS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .doc-card {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .doc-card:hover {
+      border-color: #6366f1 !important;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15) !important;
+    }
+    [data-theme="light"] .doc-card-title {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="light"] .doc-card-id {
+      color: #475569 !important;
+      font-weight: 700 !important;
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] .doc-card-meta {
+      color: #475569 !important;
+    }
+    [data-theme="light"] .home-section-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+
+    /* NAVBAR LIGHT MODE HIGH CONTRAST */
+    [data-theme="light"] .top-navbar {
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    }
+    [data-theme="light"] .nav-app-name {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .nav-user-info {
+      color: #1e293b !important;
+      background-color: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      font-weight: 600 !important;
+    }
+
+
+    /* MOBILE HORIZONTAL TABLE SCROLL FIX */
+    .section-body {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      max-width: 100% !important;
+    }
+
+    @media (max-width: 768px) {
+      .signoff-table,
+      .revision-table,
+      .data-table {
+        min-width: 640px !important; /* Ensures mobile users can swipe horizontal and click all signature buttons */
+        display: table !important;
+      }
+      .signoff-cell {
+        min-width: 140px !important;
+      }
+      .btn-sig-trigger {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+      }
+    }
+
 </style>
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/@supabase-js@2" defer></script>
@@ -2213,9 +2345,9 @@
         <hr class="modal-divider" />
         <div class="quick-login-title">Pilih Peran Cepat (Akses Demo):</div>
         <div class="quick-login-grid">
-          <button class="btn btn-outline-secondary btn-sm" onclick="quickLogin('qa-lead')">QA Lead</button>
-          <button class="btn btn-outline-secondary btn-sm" onclick="quickLogin('tech-lead')">Tech Lead</button>
-          <button class="btn btn-outline-secondary btn-sm" onclick="quickLogin('manager')">Manager</button>
+          
+          
+          
         </div>
       </div>
     </div>
@@ -2374,19 +2506,7 @@
       }
     }
 
-    function quickLogin(type) {
-      if (type === 'qa-lead') {
-        document.getElementById('login-username').value = 'qa.lead';
-        document.getElementById('login-password').value = 'qa2026!';
-      } else if (type === 'tech-lead') {
-        document.getElementById('login-username').value = 'tech.lead';
-        document.getElementById('login-password').value = 'tech2026!';
-      } else {
-        document.getElementById('login-username').value = 'manager.holycat';
-        document.getElementById('login-password').value = 'manager2026!';
-      }
-      processLogin();
-    }
+     
 
     function logoutUser() {
       localStorage.removeItem('holycat_qa_user');
@@ -2881,11 +3001,33 @@ ${shareUrl}`);
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    function openSignatureModal(role) {
-      if (docStatus === 'APPROVED') return;
+        function openSignatureModal(role) {
+      if (docStatus === 'APPROVED') {
+        alert('⛔ Dokumen ini telah disetujui secara formal (Read-Only) dan tidak dapat diubah lagi.');
+        return;
+      }
+      if (!currentUser) {
+        alert('🔐 Silakan masuk terlebih dahulu untuk melakukan penandatanganan.');
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+      
+      // Strict Role Privilege Check
+      if (currentUser.role !== role) {
+        const roleNames = {
+          'qa-lead': 'QA Lead / Specialist',
+          'tech-lead': 'Tech Lead / Principal Architect',
+          'product-owner': 'Product Manager / Owner'
+        };
+        alert(`⛔ Akses Ditolak: Anda sedang masuk sebagai [${currentUser.title}].
+
+Hanya pengguna dengan peran [${roleNames[role] || role}] yang memiliki wewenang untuk menandatangani kolom ini.`);
+        return;
+      }
+
       activeSignatureRole = role;
       setElementStyle('signature-modal', 'display', 'flex');
-      setTimeout(initSignatureCanvas, 100);
+      initCanvas();
     }
 
     function closeSignatureModal() {
@@ -3596,10 +3738,16 @@ ${shareUrl}`);
       }
     }
 
-    function showHomeView() {
+        function showHomeView() {
       setElementStyle('home-view', 'display', 'block');
       setElementStyle('form-view', 'display', 'none');
       setElementStyle('nav-btn-home', 'display', 'none');
+      
+      // Hide document-specific navbar buttons on Home View
+      setElementStyle('btn-save-doc', 'display', 'none');
+      setElementStyle('btn-print-doc', 'display', 'none');
+      const shareWrap = document.querySelector('.share-popover-wrapper');
+      if (shareWrap) shareWrap.style.display = 'none';
       
       // Update URL to clean home path
       const cleanUrl = window.location.origin + window.location.pathname;
@@ -3613,9 +3761,15 @@ ${shareUrl}`);
       setElementStyle('form-view', 'display', 'block');
       setElementStyle('nav-btn-home', 'display', 'inline-flex');
 
+      // Show document-specific navbar buttons on Form View
+      setElementStyle('btn-save-doc', 'display', 'inline-flex');
+      setElementStyle('btn-print-doc', 'display', 'inline-flex');
+      const shareWrap = document.querySelector('.share-popover-wrapper');
+      if (shareWrap) shareWrap.style.display = 'inline-block';
+
       if (docId) {
         currentDocId = docId;
-        const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(docId)}`;
+        const newUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(docId);
         window.history.replaceState(null, '', newUrl);
         loadDocumentFromCloud(docId);
       }
