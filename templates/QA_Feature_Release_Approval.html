@@ -983,6 +983,108 @@
       background: var(--linear-indigo-hover) !important;
     }
 
+
+    /* --- MOBILE RESPONSIVE NAVBAR --- */
+    .mobile-user-info {
+      display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+      .top-navbar {
+        height: 56px;
+        padding: 0 12px;
+        position: relative;
+      }
+      .nav-brand {
+        gap: 8px;
+      }
+      .nav-brand img {
+        height: 28px !important; /* Slightly smaller for mobile viewport */
+      }
+      .nav-brand-tag {
+        font-size: 8px;
+        padding: 1px 4px;
+        height: 16px;
+      }
+      
+      /* Hide user info from navbar, we'll put it in the menu drawer */
+      .nav-user-info {
+        display: none !important;
+      }
+      
+      /* Show hamburger button on mobile */
+      .hamburger-btn {
+        display: inline-flex !important;
+      }
+      
+      /* Turn actions block into a dropdown menu drawer on mobile */
+      .nav-actions {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border-strong);
+        flex-direction: column;
+        padding: 12px 16px;
+        gap: 10px;
+        z-index: 1000;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      }
+      
+      /* When active, show mobile menu drawer */
+      .nav-actions.is-active {
+        display: flex !important;
+      }
+      
+      /* Make elements block width */
+      .nav-actions .btn, 
+      .nav-actions .history-popover-wrapper, 
+      .nav-actions .share-popover-wrapper {
+        width: 100% !important;
+        display: block !important;
+      }
+      .nav-actions .btn {
+        display: inline-flex !important;
+        width: 100% !important;
+        justify-content: center;
+        height: 36px;
+        font-size: 12px;
+      }
+      .nav-actions .history-popover-wrapper button,
+      .nav-actions .share-popover-wrapper button {
+        width: 100% !important;
+        justify-content: center;
+        height: 36px;
+      }
+      
+      /* Adjust popovers to occupy full-width on mobile */
+      .history-popover, .share-popover {
+        position: static !important;
+        width: 100% !important;
+        margin-top: 6px;
+        box-shadow: none !important;
+        border: 1px solid var(--border-subtle) !important;
+      }
+      
+      /* Show mobile user info item in actions drawer */
+      .mobile-user-info {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--bg-sidebar);
+        border: 1px solid var(--border-card);
+        border-radius: var(--radius-sm);
+        margin-bottom: 6px;
+        text-align: center;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -996,7 +1098,15 @@
       <span class="nav-brand-tag" style="background:var(--accent-subtle); color:var(--accent); border: 1px solid var(--accent-glow); display: inline-flex; align-items: center; align-self: center; height: 20px; font-size: 10px; font-weight: 700; padding: 0 8px; border-radius: 4px; line-height: 1; margin: 0;">QA APPROVAL</span>
     </div>
     <div class="nav-user-info" id="nav-user-display">Pengguna: Belum Otentikasi</div>
-    <div class="nav-actions" style="position: relative;">
+    
+    <!-- Mobile Hamburger Toggle Button -->
+    <button class="btn btn-ghost hamburger-btn" onclick="toggleMobileMenu()" title="Menu Aksi" style="display: none; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; align-self: center; margin-left: auto; margin-right: 8px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+
+    <div class="nav-actions">
+      <!-- Mobile User Info (Only visible on Mobile view) -->
+      <div class="mobile-user-info" id="mobile-user-display">Pengguna: Belum Otentikasi</div>
       <button class="btn btn-ghost" id="theme-toggle" onclick="toggleTheme()" title="Ganti Tema Mode">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
@@ -2609,6 +2719,29 @@ ${shareUrl}`);
         sharePopover.style.display = 'none';
       }
     });
+
+  
+    // =============================================
+    //  MOBILE RESPONSIVE MENU TOGGLE
+    // =============================================
+    function toggleMobileMenu() {
+      const actions = document.querySelector('.nav-actions');
+      if (actions) {
+        actions.classList.toggle('is-active');
+      }
+    }
+
+    // Sync user login title to mobile display
+    const originalApplyAuthUI = applyAuthUI;
+    applyAuthUI = function() {
+      if (typeof originalApplyAuthUI === 'function') {
+        originalApplyAuthUI();
+      }
+      const mobDisplay = document.getElementById('mobile-user-display');
+      if (mobDisplay && currentUser) {
+        mobDisplay.textContent = `Pengguna: ${currentUser.title}`;
+      }
+    };
 
   </script>
 
