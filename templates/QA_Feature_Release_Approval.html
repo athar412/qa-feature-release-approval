@@ -17,7 +17,7 @@
     /*  HOLYCAT MODERN CORPORATE UI SYSTEM               */
     /* ================================================= */
 
-    :root, [data-theme="light"], [data-theme="dark"] {
+    :root, [data-theme="light"] {
       --bg-app: #EAF6F0; /* Holycat Mint Green background */
       --bg-card: #FFFFFF;
       --bg-card-hover: #F9FAFB;
@@ -62,6 +62,47 @@
       --radius-lg: 16px;
       
       --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #08090B;
+      --bg-card: #12131A;
+      --bg-card-hover: #161722;
+      --bg-input: #151620;
+      --bg-input-focus: #1C1D2A;
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      
+      --text-main: #F2F3F5;
+      --text-muted: #8F94A0;
+      --text-subtle: #5C606E;
+      
+      /* Primary Holycat Green replacing Indigo in dark mode too */
+      --linear-indigo: #42A774;
+      --linear-indigo-hover: #358b5e;
+      --linear-indigo-glow: rgba(66, 167, 116, 0.22);
+      
+      --linear-green: #42A774;
+      --linear-green-bg: rgba(66, 167, 116, 0.15);
+      --linear-green-border: rgba(66, 167, 116, 0.3);
+      
+      --linear-red: #EB5757;
+      --linear-red-bg: rgba(235, 87, 87, 0.15);
+      --linear-red-border: rgba(235, 87, 87, 0.3);
+      
+      --linear-amber: #F2994A;
+      --linear-amber-bg: rgba(242, 153, 74, 0.15);
+      --linear-amber-border: rgba(242, 153, 74, 0.3);
+      
+      --linear-blue: #2F80ED;
+      --linear-blue-bg: rgba(47, 128, 237, 0.15);
+      
+      /* Dashboard Accent Borders */
+      --accent-blue: #3B82F6;
+      --accent-green: #10B981;
+      --accent-purple: #8B5CF6;
+      --accent-orange: #F59E0B;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2328,22 +2369,25 @@
 
   <!-- LOGIN MODAL -->
   <div id="login-modal" class="modal-overlay no-print" style="display: flex;">
-    <div class="modal-card">
-      <div class="modal-header">Otentikasi Peran Pengguna (PT Holycatlabs)</div>
-      <div class="modal-body">
-        <p class="text-sub" style="margin-bottom:16px;">Silakan masuk menggunakan kredensial peran yang sesuai dengan baris persetujuan Anda.</p>
-        <div class="form-group">
-          <label>Nama Pengguna (Username)</label>
-          <input type="text" id="login-username" class="form-control" placeholder="Contoh: qa.lead / tech.lead / manager.holycat" />
-        </div>
-        <div class="form-group">
-          <label>Kata Sandi (Password)</label>
-          <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi..." />
-        </div>
-        <div id="login-error" class="login-error-msg" style="display:none;">Username atau password tidak sesuai dengan peran.</div>
-        <button class="btn btn-primary btn-block" onclick="processLogin()">Masuk ke Sistem</button>
+    <div class="modal-card" style="padding: 32px; max-width: 400px; border-radius: 24px; text-align: center; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.08);">
+      <div class="modal-body" style="padding: 0;">
+        <img src="https://media.licdn.com/dms/image/v2/D560BAQFjYyZ8e4m8-Q/company-logo_200_200/company-logo_200_200/0/1712658823190/pt_holycatlabs_indonesia_logo?e=1745452800&v=beta&t=k6q84_x15C8aQvYjH840y5xL4b6g_eI_3Y2gG7N57bU" alt="Logo" style="height: 48px; margin-bottom: 24px;" />
+        <h2 style="font-size: 24px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Masuk</h2>
+        <p class="text-sub" style="margin-bottom: 32px; font-size: 13px;">Silakan masuk menggunakan kredensial peran yang sesuai dengan baris persetujuan Anda.</p>
         
-        
+        <div class="form-group" style="text-align: left; margin-bottom: 16px;">
+          <label style="font-size: 12px; text-transform: none; font-weight: 600; color: var(--text-main);">Nama Pengguna (Username)</label>
+          <input type="text" id="login-username" class="form-control" placeholder="Contoh: qa.lead" style="padding: 12px 16px; border-radius: 12px; font-size: 13px;" />
+        </div>
+        <div class="form-group" style="text-align: left; margin-bottom: 24px;">
+          <label style="font-size: 12px; text-transform: none; font-weight: 600; color: var(--text-main);">Kata Sandi (Password)</label>
+          <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi..." style="padding: 12px 16px; border-radius: 12px; font-size: 13px;" />
+        </div>
+        <div id="login-error" class="login-error-msg" style="display:none; text-align: left;">Username atau password tidak sesuai dengan peran.</div>
+        <button class="btn btn-primary btn-block" onclick="processLogin()" style="padding: 12px; font-size: 14px; border-radius: 50px; justify-content: space-between;">
+          <span>Masuk</span>
+          <span style="font-size: 18px; line-height: 1;">&rarr;</span>
+        </button>
       </div>
     </div>
   </div>
