@@ -170,7 +170,13 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      overflow-x: auto;      /* Jika tombol terlalu banyak untuk 1 baris, geser horizontal (bukan pecah 2 baris) */
+      overflow-y: hidden;
+      scrollbar-width: none; /* Sembunyikan scrollbar (Firefox) agar tetap rapi secara visual */
+      -ms-overflow-style: none;
+      max-width: 68vw;       /* Sisakan ruang untuk logo & info pengguna di kiri */
     }
+    .nav-actions::-webkit-scrollbar { display: none; } /* Sembunyikan scrollbar (Chrome/Safari) */
 
     /* --- BUTTONS --- */
     .btn {
@@ -187,6 +193,8 @@
       gap: 6px;
       transition: all 0.2s ease;
       text-decoration: none;
+      white-space: nowrap; /* Cegah label tombol pecah jadi 2 baris (navbar berantakan) */
+      flex-shrink: 0;      /* Cegah tombol ikut menyusut/terkompresi saat ruang sempit */
     }
     .btn-primary { background: var(--linear-indigo) !important; color: #ffffff !important; border: 1px solid var(--linear-indigo) !important; box-shadow: 0 4px 12px var(--linear-indigo-glow); }
     .btn-primary:hover { background: var(--linear-indigo-hover) !important; transform: translateY(-1px); }
@@ -1078,6 +1086,10 @@
         gap: 10px;
         z-index: 1000;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        max-width: none;       /* Reset batas lebar desktop agar drawer mobile full-width */
+        overflow-x: visible;   /* Reset scroll horizontal desktop, drawer mobile scroll vertikal */
+        overflow-y: auto;
+        max-height: calc(100vh - 56px);
       }
       
       /* When active, show mobile menu drawer */
@@ -2826,19 +2838,19 @@
       <div class="section-body">
         <div class="metrics-grid">
           <div class="metric-card metric-card--total">
-            <div class="metric-value" contenteditable="true">0</div>
+            <div class="metric-value" id="metric-total">0</div>
             <div class="metric-label">Total Tes</div>
           </div>
           <div class="metric-card metric-card--pass">
-            <div class="metric-value" contenteditable="true">0</div>
+            <div class="metric-value" id="metric-pass">0</div>
             <div class="metric-label">Passed</div>
           </div>
           <div class="metric-card metric-card--fail">
-            <div class="metric-value" contenteditable="true">0</div>
+            <div class="metric-value" id="metric-fail">0</div>
             <div class="metric-label">Failed</div>
           </div>
           <div class="metric-card metric-card--skip">
-            <div class="metric-value" contenteditable="true">0</div>
+            <div class="metric-value" id="metric-skip">0</div>
             <div class="metric-label">Skipped</div>
           </div>
         </div>
@@ -3422,6 +3434,33 @@
     function checkAuth() {
       const savedUserStr = localStorage.getItem('holycat_qa_user');
 
+      if (savedUserStr) {
+        try {
+          currentUser = JSON.parse(savedUserStr);
+          applyAuthUI();
+          return;
+        } catch (e) {
+          currentUser = null;
+        }
+      }
+      
+      // Guest / Unauthenticated State: Lock access with login modal
+      currentUser = null;
+      setElementStyle('login-modal', 'display', 'flex');
+      
+      const authBtn = document.getElementById('nav-btn-auth');
+      if (authBtn) {
+        authBtn.className = 'btn btn-sm btn-primary';
+        authBtn.innerHTML = '🔑 Masuk / Login';
+        authBtn.onclick = function() { setElementStyle('login-modal', 'display', 'flex'); };
+      }
+
+      const navDisplay = document.getElementById('nav-user-display');
+      if (navDisplay) navDisplay.textContent = 'Pengguna: Belum Login';
+      const mobDisplay = document.getElementById('mobile-user-display');
+      if (mobDisplay) mobDisplay.textContent = 'Pengguna: Belum Login';
+    }
+
     // ================================================================
     //  PASS RATE & TEST SUMMARY METRICS CALCULATION ENGINE
     // ================================================================
@@ -3543,11 +3582,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const prefixEl = document.getElementById('doc-system-prefix');
-      if (prefixEl) {
-        prefixEl.addEventListener('change', updateAutoDocNumber);
-      }
-      
+      // Catatan: pemicu utama sudah ada di atribut inline onchange="updateAutoDocNumber()"
+      // pada <select id="doc-system-prefix"> — ini tetap berfungsi meski elemen di-render ulang
+      // (mis. saat membuka dokumen tersimpan). addEventListener terpisah di sini SENGAJA dihapus
+      // karena menyebabkan updateAutoDocNumber() terpanggil DUA KALI per perubahan (nomor dokumen
+      // bisa meloncat 2 angka sekaligus akibat race condition pada localStorage).
+
       // Monkeypatch the status badge click to trigger metrics update
       document.addEventListener('click', function(e) {
         if (e.target.classList.contains('status') || e.target.classList.contains('priority')) {
@@ -3689,32 +3729,6 @@
       };
       reader.readAsText(file);
       e.target.value = '';
-    }
-      if (savedUserStr) {
-        try {
-          currentUser = JSON.parse(savedUserStr);
-          applyAuthUI();
-          return;
-        } catch (e) {
-          currentUser = null;
-        }
-      }
-      
-      // Guest / Unauthenticated State: Lock access with login modal
-      currentUser = null;
-      setElementStyle('login-modal', 'display', 'flex');
-      
-      const authBtn = document.getElementById('nav-btn-auth');
-      if (authBtn) {
-        authBtn.className = 'btn btn-sm btn-primary';
-        authBtn.innerHTML = '🔑 Masuk / Login';
-        authBtn.onclick = function() { setElementStyle('login-modal', 'display', 'flex'); };
-      }
-
-      const navDisplay = document.getElementById('nav-user-display');
-      if (navDisplay) navDisplay.textContent = 'Pengguna: Belum Login';
-      const mobDisplay = document.getElementById('mobile-user-display');
-      if (mobDisplay) mobDisplay.textContent = 'Pengguna: Belum Login';
     }
 
     function handleAuthClick() {
@@ -4850,6 +4864,8 @@
       } catch(e) {}
 
       // 4. Delete from Supabase Database
+      let cloudDeleteFailed = false;
+      let cloudDeleteErrorMsg = '';
       if (supabaseClient) {
         try {
           const { error } = await supabaseClient
@@ -4859,15 +4875,28 @@
 
           if (error) {
             console.warn("Supabase Delete Warning:", error.message);
+            cloudDeleteFailed = true;
+            cloudDeleteErrorMsg = error.message;
           } else {
             console.log("Supabase Delete Success:", docId);
           }
         } catch(err) {
           console.warn("Supabase Delete Error:", err.message);
+          cloudDeleteFailed = true;
+          cloudDeleteErrorMsg = err.message;
         }
       }
 
-      alert(`✅ Dokumen [${docId}] berhasil dihapus secara permanen dari database.`);
+      if (cloudDeleteFailed) {
+        alert(
+          `⚠️ Dokumen [${docId}] dihapus dari tampilan lokal, TAPI GAGAL dihapus dari Database Cloud Supabase.\n\n` +
+          `Kemungkinan besar penyebabnya: Row Level Security (RLS) policy pada tabel "qa_documents" belum mengizinkan operasi DELETE untuk role "anon".\n\n` +
+          `Detail error: ${cloudDeleteErrorMsg}\n\n` +
+          `Dokumen ini akan MUNCUL KEMBALI saat Anda refresh / buka dari device lain. Silakan periksa pengaturan RLS di dashboard Supabase Anda.`
+        );
+      } else {
+        alert(`✅ Dokumen [${docId}] berhasil dihapus secara permanen dari database.`);
+      }
 
       // 5. Navigate back to Home if the current open document was deleted
       if (currentDocId === docId || document.getElementById('form-view').style.display !== 'none') {
