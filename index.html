@@ -2441,11 +2441,19 @@
 
     <!-- HOME VIEW / DASHBOARD LANDING -->
   <div id="home-view" class="no-print" style="display: block;">
-    <div class="home-hero" style="position: relative; overflow: hidden; padding: 60px 40px;">
-      <video src="./assets/banner.mp4" autoplay loop muted playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; border-radius: inherit;"></video>
-      <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 0; border-radius: inherit;"></div>
-      <h1 style="position: relative; z-index: 1; color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">QA Feature Release Approval Hub</h1>
-      <p style="position: relative; z-index: 1; color: #f1f1f1 !important; text-shadow: 0 1px 5px rgba(0,0,0,0.5); font-size: 1.15rem; max-width: 600px; margin: 0 auto 28px auto;">Pusat evaluasi dan persetujuan rilis fitur QA secara cepat, aman, dan tersentralisasi.</p>
+    <div class="home-hero" style="position: relative; overflow: hidden; padding: 70px 40px; border-radius: 24px; background: linear-gradient(135deg, rgba(68, 175, 124, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.05);">
+      
+      <!-- Glassmorphism Blur Layer -->
+      <div style="position: absolute; inset: 0; z-index: 0; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.2);"></div>
+      
+      <!-- Decorative Blobs -->
+      <div style="position: absolute; top: -20%; left: -10%; width: 300px; height: 300px; background: var(--hc-primary); filter: blur(80px); opacity: 0.15; z-index: 0; border-radius: 50%;"></div>
+      <div style="position: absolute; bottom: -20%; right: -10%; width: 300px; height: 300px; background: #3b82f6; filter: blur(80px); opacity: 0.1; z-index: 0; border-radius: 50%;"></div>
+
+      <h1 style="position: relative; z-index: 1; font-size: 2.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 16px; letter-spacing: -0.03em; text-shadow: 0 1px 2px rgba(255,255,255,0.8);">QA Feature Release Approval Hub</h1>
+      
+      <p style="position: relative; z-index: 1; color: var(--text-sub); font-size: 1.1rem; max-width: 650px; margin: 0 auto 32px auto; line-height: 1.6; font-weight: 500;">Pusat evaluasi dan persetujuan rilis fitur QA secara cepat, aman, dan tersentralisasi untuk menjaga standar kualitas perusahaan.</p>
+      
       <div class="home-action-btns" style="position: relative; z-index: 1;">
         <button class="btn-hero-primary" onclick="createNewDocument()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
