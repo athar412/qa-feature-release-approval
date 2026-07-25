@@ -2353,7 +2353,7 @@
     }
 
     /* ── HOLYCAT LOGIN REDESIGN (standar LoginView.js e-commerce) ── */
-    #login-modal { overflow: hidden; }
+    #login-modal { overflow: visible; }
     #login-modal .modal-card {
       position: relative;
       z-index: 1; /* di atas blob dekorasi; jika dot-canvas dipasang nanti, beri canvas z-index 0 & pointer-events:none */
@@ -5023,17 +5023,12 @@
         }));
       }
 
-      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       function loop() {
         var colors = themeColors();
         for (var i = 0; i < fields.length; i++) fields[i].frame(colors);
         requestAnimationFrame(loop);
       }
-      if (fields.length && !reduceMotion) requestAnimationFrame(loop);
-      else if (fields.length) {
-        var colors = themeColors();
-        for (var i = 0; i < fields.length; i++) fields[i].frame(colors);
-      }
+      if (fields.length) requestAnimationFrame(loop);
     })();
   </script>
 
