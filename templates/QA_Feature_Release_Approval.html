@@ -2417,6 +2417,35 @@
     }
     #login-modal .form-control:focus + svg,
     .input-icon-wrap:focus-within svg { color: var(--hc-primary); }
+
+    /* ── AUTO DOCUMENT NUMBER (non-editable, generated from Kode Sistem) ── */
+    .doc-control-value--locked {
+      cursor: not-allowed;
+      user-select: none;
+      background: var(--bg-input, rgba(0,0,0,0.03));
+      color: var(--text-muted);
+      opacity: 0.9;
+      pointer-events: none; /* mencegah klik/fokus/ketik langsung */
+    }
+    .doc-control-auto-tag {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--hc-primary-text, var(--accent-green));
+      background: var(--hc-primary-soft, rgba(68,175,124,0.12));
+      border: 1px solid var(--hc-primary-border-soft, rgba(68,175,124,0.3));
+      border-radius: 999px;
+      padding: 1px 7px;
+      margin-left: 6px;
+      letter-spacing: 0.2px;
+      vertical-align: middle;
+    }
+    /* Tombol hapus dokumen (danger outline) */
+    .btn-danger-outline {
+      background: transparent;
+      border: 1px solid var(--linear-red, #e5484d);
+      color: var(--linear-red, #e5484d);
+    }
+    .btn-danger-outline:hover { background: rgba(229,72,77,0.1); }
     /* ── HOLYCAT WATERMARK (logo semi-transparan) ── */
     .doc-watermark {
       position: fixed;
@@ -2505,6 +2534,10 @@
       <button class="btn btn-sm btn-outline-light" id="btn-save-doc" style="display: none;" onclick="saveDocument()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         Simpan Dokumen
+      </button>
+      <button class="btn btn-sm btn-danger-outline no-print" id="btn-delete-doc" style="display: none;" title="Hapus Dokumen Ini Secara Permanen" onclick="deleteDocumentAction(currentDocId)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+        Hapus
       </button>
       
       <!-- History Button with Hover Popover -->
@@ -2687,8 +2720,8 @@
           </select>
         </div>
         <div class="doc-control-item">
-          <span class="doc-control-label">Nomor Dokumen</span>
-          <span class="doc-control-value" id="doc-control-num" contenteditable="true" data-placeholder="ECM-REL-2026-001">ECM-REL-2026-001</span>
+          <span class="doc-control-label">Nomor Dokumen <span class="doc-control-auto-tag no-print" title="Nomor dibuat otomatis mengikuti Kode Sistem yang dipilih & nomor urut terakhir yang tersimpan">🔒 Otomatis</span></span>
+          <span class="doc-control-value doc-control-value--locked" id="doc-control-num" data-placeholder="ECM-REL-2026-001">ECM-REL-2026-001</span>
         </div>
         <div class="doc-control-item">
           <span class="doc-control-label">Nama Dokumen / Nama Fitur</span>
@@ -2764,12 +2797,18 @@
                 <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi kebutuhan..."></span></td>
                 <td><span class="editable" contenteditable="true" data-placeholder="TC-001">TC-001</span></td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Manual">Manual</span></td>
-                <td class="center"><span class="status status--pass">Pass</span></td>
+                <td class="center">
+                  <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+                    <option value="Pass" selected>Pass</option>
+                    <option value="Fail">Fail</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="label-helper no-print mt-16" style="font-size:11px; color:var(--text-muted);">Catatan: Klik pada sel tabel untuk mengedit. Klik pada badge status untuk mengubah status.</div>
+        <div class="label-helper no-print mt-16" style="font-size:11px; color:var(--text-muted);">Catatan: Klik pada sel tabel untuk mengedit. Gunakan dropdown pada kolom Status untuk mengubah status (Pass Rate akan diperbarui otomatis).</div>
         <div style="display: flex; gap: 10px;" class="no-print">
           <button class="mt-16 btn btn-outline-secondary" onclick="addRtmRow()" style="flex: 1;">+ Tambah Baris RTM</button>
           <button class="mt-16 btn btn-outline-secondary" style="flex: 1;" onclick="document.getElementById('rtm-excel-input').click()">Impor Excel / CSV (RTM)</button>
@@ -3393,11 +3432,14 @@
 
       for (let i = 0; i < rows.length; i++) {
         let statusText = '';
-        const selectEl = rows[i].cells[3].querySelector('select');
+        // Kolom Status ada di index 4 (REQ ID, Deskripsi, TC ID, Metode, Status)
+        const statusCell = rows[i].cells[4];
+        if (!statusCell) continue;
+        const selectEl = statusCell.querySelector('select');
         if (selectEl) {
           statusText = selectEl.value.toUpperCase();
         } else {
-          statusText = rows[i].cells[3].innerText.trim().toUpperCase();
+          statusText = statusCell.innerText.trim().toUpperCase();
         }
         
         if (statusText === 'PASS') { passed++; }
@@ -3440,6 +3482,12 @@
 
     // Call updateMetricsFromRtm whenever the DOM changes to capture inline edits
     document.addEventListener('input', function(e) {
+      if (e.target.closest('#rtm-table')) {
+        updateMetricsFromRtm();
+      }
+    });
+    // Dropdown status (select) tidak selalu memicu event 'input', jadi didengarkan terpisah via 'change'
+    document.addEventListener('change', function(e) {
       if (e.target.closest('#rtm-table')) {
         updateMetricsFromRtm();
       }
@@ -3506,6 +3554,9 @@
           setTimeout(updateMetricsFromRtm, 50);
         }
       });
+
+      // Hitung Pass Rate awal dari baris RTM template statis (jika ada)
+      updateMetricsFromRtm();
     });
 
     // ================================================================
@@ -3983,6 +4034,7 @@
         </td>
       `;
       tbody.appendChild(tr);
+      updateMetricsFromRtm(); // Sertakan baris baru ke perhitungan Pass Rate
     }
 
     // ================================================================
@@ -4361,6 +4413,7 @@
 
       updateStatusBanners();
       applyAuthUI();
+      updateMetricsFromRtm(); // Hitung ulang Pass Rate & progress bar segera setelah dokumen dimuat
     }
 
     
@@ -4500,8 +4553,9 @@
             <td>${d.docName || d.featureName || 'Formulir Persetujuan Rilis'}</td>
             <td>${d.date || d.docDate || 'Terbaru'}</td>
             <td>${statusBadge}</td>
-            <td>
+            <td style="display:flex; gap:6px;">
               <button class="btn btn-sm btn-primary" onclick="loadHistoryDocument('${d.id}')">Buka</button>
+              <button class="btn btn-sm btn-danger-outline" title="Hapus Dokumen Permanen" onclick="deleteDocumentAction('${d.id}').then(() => renderHistoryTable())">🗑️ Hapus</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -4734,6 +4788,9 @@
               <button class="btn btn-sm btn-secondary" title="Salin Tautan Share" onclick="copyShareUrlDirect('${shareUrl}', this)">
                 🔗 Link
               </button>
+              <button class="btn btn-sm btn-danger-outline" title="Hapus Dokumen Permanen" onclick="deleteDocumentAction('${d.id}')">
+                🗑️
+              </button>
             </div>
           </div>
         `;
@@ -4828,6 +4885,7 @@
       // Hide document-specific navbar buttons on Home View
       setElementStyle('btn-save-doc', 'display', 'none');
       setElementStyle('btn-print-doc', 'display', 'none');
+      setElementStyle('btn-delete-doc', 'display', 'none');
       const shareWrap = document.querySelector('.share-popover-wrapper');
       if (shareWrap) shareWrap.style.display = 'none';
       
@@ -4845,6 +4903,7 @@
 
       // Show document-specific navbar buttons on Form View
       setElementStyle('btn-save-doc', 'display', 'inline-flex');
+      setElementStyle('btn-delete-doc', 'display', 'inline-flex');
       const printBtn = document.getElementById('btn-print-doc');
       if (printBtn) printBtn.style.setProperty('display', 'inline-flex', 'important');
       const shareWrap = document.querySelector('.share-popover-wrapper');
@@ -4867,49 +4926,32 @@
         setElementStyle('login-modal', 'display', 'flex');
         return;
       }
-      const prefixEl = document.getElementById('doc-system-prefix');
-      const prefix = prefixEl ? prefixEl.value : 'QA-REL';
-      const year = new Date().getFullYear();
-      let lastNumber = localStorage.getItem('holycat_qa_doc_num_' + prefix) || 0;
-      lastNumber = parseInt(lastNumber) + 1;
-      const newId = `${prefix}-${year}-${String(lastNumber).padStart(3, '0')}`;
-      
-      // Update local storage so next click on create document increments
-      localStorage.setItem('holycat_qa_doc_num_' + prefix, lastNumber);
       // Reset form to blank draft state
       docStatus = 'PENDING';
-      currentDocId = newId;
-      
-      // Open form view with new ID
-      showFormView(newId);
+      rejectionReason = '';
+      currentDocId = null;
 
-      // Set input values
-      const idInput = document.getElementById('doc-number-input');
-      if (idInput) idInput.value = newId;
+      // Buka form kosong (tanpa docId) — memakai template statis, TIDAK memuat dokumen lain
+      showFormView();
 
-      const nameInput = document.getElementById('doc-name-input');
-      if (nameInput) nameInput.value = 'Pengajuan Persetujuan Rilis Fitur Baru';
+      // Nama dokumen dikosongkan agar user mengisi sendiri (placeholder tetap tampil)
+      const nameEl = document.getElementById('doc-control-name');
+      if (nameEl) nameEl.textContent = '';
 
-      // Save initial blank draft
-      saveCurrentState();
+      // Nomor dokumen dibuat OTOMATIS berdasarkan Kode Sistem yang dipilih +
+      // nomor urut berikutnya dari dokumen terakhir yang tersimpan (Supabase/localStorage)
+      updateAutoDocNumber().then(() => {
+        const numEl = document.getElementById('doc-control-num');
+        const newId = numEl ? numEl.textContent.trim() : null;
+        if (newId) {
+          currentDocId = newId;
+          const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(newId)}`;
+          window.history.replaceState(null, '', newUrl);
+        }
+        // Simpan draft awal agar nomor dokumen langsung tercatat (mencegah duplikat nomor)
+        saveDocumentSilently();
+      });
     }
-
-    // Dynamic listener for Document Number Input changes to keep URL and Supabase ID synced
-    document.addEventListener('DOMContentLoaded', function() {
-      const idInput = document.getElementById('doc-number-input');
-      if (idInput) {
-        idInput.addEventListener('change', function() {
-          const val = this.value.trim();
-          if (val && val !== currentDocId) {
-            console.log(`Document ID changed from ${currentDocId} to ${val}`);
-            currentDocId = val;
-            const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(val)}`;
-            window.history.replaceState(null, '', newUrl);
-            saveCurrentState();
-          }
-        });
-      }
-    });
 
     // AUTO-NAVIGATE ON INITIAL LOAD BASED ON URL QUERY PARAMS
     window.addEventListener('load', function() {
