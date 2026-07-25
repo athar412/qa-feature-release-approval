@@ -2509,6 +2509,8 @@
       display: block;
       z-index: 0;            /* di belakang konten (home-view diberi z-index 1), di bawah watermark (2) */
       pointer-events: none;  /* tidak menghalangi klik/scroll */
+      transform: translateZ(0); /* paksa layer GPU sendiri agar fixed-position tidak jank saat momentum-scroll di Safari iOS */
+      will-change: transform;
     }
     #home-view, #form-view { position: relative; z-index: 1; }
     #login-modal .login-dot-canvas {
@@ -2534,9 +2536,11 @@
 
     @media (max-width: 768px) {
 
-      /* ── PERFORMA: matikan animasi & efek berat di HP ── */
-      #dot-canvas-app,
-      #dot-canvas-login { display: none !important; }
+      /* ── PERFORMA: efek dekoratif berat lain tetap disederhanakan di HP ──
+         Dot cursor magnetik TIDAK lagi dimatikan di sini — sekarang tetap
+         tampil & interaktif (ikut jari saat disentuh), tapi diatur hemat
+         baterai lewat JS: kepadatan titik dikurangi & animasi otomatis
+         berhenti saat tidak ada interaksi (lihat skrip HOLYCAT DOT CURSOR). */
       .home-hero::before,
       .home-hero::after {
         width: 220px !important; height: 220px !important;
@@ -5500,17 +5504,19 @@
        - #dot-canvas-login : background overlay login (di luar popup;
                              area dalam popup otomatis tertutup card putih) */
     (function () {
-      // OPTIMASI MOBILE: jangan jalankan animasi di layar kecil / perangkat touch /
-      // pengguna yang memilih reduced-motion — canvas juga disembunyikan via CSS,
-      // tapi guard ini memastikan loop fisika tidak membakar CPU & baterai.
-      if (
-        window.matchMedia('(max-width: 768px)').matches ||
-        window.matchMedia('(pointer: coarse)').matches ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ) return;
+      // Aksesibilitas: hormati preferensi "kurangi gerakan" di perangkat manapun (desktop/HP).
+      // Selain itu efek TETAP AKTIF di semua ukuran layar & jenis perangkat (termasuk touch),
+      // performa/baterai di HP dijaga lewat: (1) kepadatan titik lebih jarang di layar sempit,
+      // (2) mekanisme "tidur" otomatis — begitu titik-titik sudah diam & tidak ada interaksi,
+      // loop berhenti melakukan kalkulasi/gambar berat sampai ada sentuhan/gerakan baru lagi
+      // atau tampilan (home/login) baru saja dibuka, sehingga tidak membakar CPU saat idle.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      var SPACING = 26;        // jarak antar titik (px)
-      var INFLUENCE = 200;     // radius pengaruh kursor (px)
+      var isTouchDevice = window.matchMedia('(pointer: coarse)').matches ||
+                          window.matchMedia('(max-width: 768px)').matches;
+
+      var SPACING = isTouchDevice ? 38 : 26; // titik lebih jarang di HP → jauh lebih ringan per frame
+      var INFLUENCE = 200;     // radius pengaruh kursor/jari (px)
       var PULL = 1.9;          // kekuatan tarikan magnetik ke kursor
       var SPRING = 0.045;      // pegas kembali ke posisi asal
       var DAMP = 0.82;         // redaman (0-1, makin kecil makin cepat berhenti)
@@ -5518,18 +5524,25 @@
       var BASE_R = 1.4;        // radius titik dasar
       var MAX_R = 3.4;         // radius titik saat tepat di kursor ("zoom in")
       var GLOW_EASE = 0.18;    // kecepatan transisi nyala/ukuran
+      var IDLE_MS = 1800;      // jeda tanpa interaksi sebelum loop dianggap boleh "tidur"
 
       var mouse = { x: -99999, y: -99999 };
+      var lastActivity = 0;
+      function markActive() { lastActivity = performance.now(); }
+
       document.addEventListener('mousemove', function (e) {
         mouse.x = e.clientX; mouse.y = e.clientY;
+        markActive();
       }, { passive: true });
       document.addEventListener('mouseleave', function () {
         mouse.x = -99999; mouse.y = -99999;
       });
       document.addEventListener('touchmove', function (e) {
         if (e.touches && e.touches[0]) { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; }
+        markActive();
       }, { passive: true });
       document.addEventListener('touchend', function () { mouse.x = -99999; mouse.y = -99999; });
+      document.addEventListener('touchcancel', function () { mouse.x = -99999; mouse.y = -99999; });
 
       function themeColors() {
         var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -5541,10 +5554,14 @@
       function createDotField(canvas, isVisible) {
         var ctx = canvas.getContext('2d');
         var dots = [];
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
         var w = 0, h = 0, wasVisible = false;
+        var asleep = false; // true = titik sudah diam total & idle lama → lewati kerja berat
 
         function resize() {
+          // Baca ulang DPR setiap resize (bukan sekali di awal) — laptop yang dipindah
+          // ke monitor eksternal dengan skala berbeda (mis. 100% → 150%) butuh ini agar
+          // canvas tidak buram/salah skala di layar barunya.
+          var dpr = Math.min(window.devicePixelRatio || 1, 2);
           w = canvas.clientWidth; h = canvas.clientHeight;
           if (!w || !h) return;
           canvas.width = Math.round(w * dpr);
@@ -5557,21 +5574,33 @@
               // hx/hy = "rumah", x/y = posisi kini, vx/vy = kecepatan, s = intensitas
             }
           }
+          // PENTING: set canvas.width/height di atas otomatis MENGOSONGKAN isi canvas
+          // (perilaku bawaan HTML canvas). Kalau ini terjadi saat field sedang "tidur"
+          // (idle), paksa bangun supaya frame() TIDAK melewati langkah gambar berikutnya
+          // — kalau tidak, canvas akan tampak kosong sampai ada gerakan mouse berikutnya.
+          asleep = false;
         }
 
-        function frame(colors) {
+        function frame(colors, active) {
           var visible = isVisible();
           if (!visible) {
-            if (wasVisible) { ctx.clearRect(0, 0, w, h); wasVisible = false; }
+            if (wasVisible) { ctx.clearRect(0, 0, w, h); wasVisible = false; asleep = false; }
             return;
           }
-          if (!wasVisible || canvas.clientWidth !== w || canvas.clientHeight !== h) resize();
+          var justBecameVisible = !wasVisible;
+          if (justBecameVisible || canvas.clientWidth !== w || canvas.clientHeight !== h) resize();
           wasVisible = true;
+
+          // Hemat CPU/baterai: kalau tidak ada interaksi & titik sudah diam total,
+          // lewati loop fisika + gambar (kecuali baru saja jadi terlihat, agar tetap
+          // langsung tergambar saat pindah halaman/buka modal walau sedang idle).
+          if (asleep && !active && !justBecameVisible) return;
 
           var rect = canvas.getBoundingClientRect();
           var mx = mouse.x - rect.left, my = mouse.y - rect.top;
 
           ctx.clearRect(0, 0, w, h);
+          var energy = 0; // total gerak+nyala tersisa; dipakai utk deteksi "sudah diam total"
           for (var i = 0; i < dots.length; i++) {
             var d = dots[i];
 
@@ -5616,7 +5645,10 @@
             ctx.arc(d.x, d.y, r, 0, 6.2832);
             ctx.fillStyle = colors.base + a.toFixed(3) + ')';
             ctx.fill();
+
+            energy += Math.abs(d.vx) + Math.abs(d.vy) + d.s;
           }
+          asleep = !active && energy < 0.05;
         }
 
         window.addEventListener('resize', resize);
@@ -5643,7 +5675,8 @@
 
       function loop() {
         var colors = themeColors();
-        for (var i = 0; i < fields.length; i++) fields[i].frame(colors);
+        var active = (performance.now() - lastActivity) < IDLE_MS;
+        for (var i = 0; i < fields.length; i++) fields[i].frame(colors, active);
         requestAnimationFrame(loop);
       }
       if (fields.length) requestAnimationFrame(loop);
