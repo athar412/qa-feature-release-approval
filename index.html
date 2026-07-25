@@ -3024,6 +3024,22 @@
       /* Gambar bukti pengujian juga dijaga agar tidak memicu dorongan halaman */
       .evidence-card { break-inside: avoid !important; page-break-inside: avoid !important; }
       .evidence-card img { max-height: 90mm !important; object-fit: contain !important; }
+      /* ── D. KEPUTUSAN RILIS: HANYA CETAK YANG DIPILIH ──
+         Di layar kedua kartu ditampilkan agar bisa dipilih. Di PDF, mencetak
+         opsi yang TIDAK dipilih justru membingungkan pembaca dokumen resmi —
+         jadi hanya kartu terpilih yang ikut tercetak, melebar penuh. */
+      .decision-card:not(:has(input:checked)) {
+        display: none !important;
+      }
+      .decision-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .decision-card:has(input:checked) {
+        border-width: 2px !important;
+        padding: 14px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
     }
 
 </style>
@@ -4539,21 +4555,7 @@
       }
     }
 
-    // =============================================
-    //  DOCUMENT SAVE, LOAD & ACTIONS
-    // =============================================
-    // ================================================================
-    //  PERBAIKAN KRITIS: SINKRONISASI STATE <select> SEBELUM DISIMPAN
-    // ================================================================
-    // Masalah: mengubah .value pada <select> (mis. RTM diubah dari Pass ke
-    // Fail, atau Kode Sistem diganti) TIDAK otomatis mengubah atribut HTML
-    // "selected" pada <option>-nya — itu hanya berubah di properti DOM live.
-    // Akibatnya saat innerHTML di-serialize untuk disimpan ke database,
-    // pilihan yang SEBENARNYA dipilih user HILANG, dan saat dokumen dibuka
-    // lagi akan kembali ke pilihan DEFAULT (opsi pertama / opsi yang
-    // awalnya ditandai selected di HTML statis) — bukan pilihan asli user.
-    // Ini "membakar" nilai .value saat ini ke atribut selected sebelum
-    // innerHTML diambil, supaya tersimpan & terbaca kembali dengan benar.
+   
     function bakeSelectedOptions(root) {
       if (!root) return;
       root.querySelectorAll('select').forEach(sel => {
@@ -4565,6 +4567,17 @@
             opt.removeAttribute('selected');
           }
         });
+      });
+      // Radio (Keputusan Rilis Go/No-Go) punya masalah yang sama seperti <select>:
+      // mengklik radio hanya mengubah properti DOM, atribut HTML "checked" tidak
+      // ikut berubah. Tanpa ini, pilihan NO-GO hilang saat dokumen disimpan dan
+      // kembali ke GO (yang ditulis checked di HTML statis) saat dibuka lagi.
+      root.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(inp => {
+        if (inp.checked) {
+          inp.setAttribute('checked', 'checked');
+        } else {
+          inp.removeAttribute('checked');
+        }
       });
     }
 
