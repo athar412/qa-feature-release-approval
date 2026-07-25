@@ -3591,6 +3591,14 @@
       const docNum = `${pattern}${String(nextNumber).padStart(3, '0')}`;
       numberEl.textContent = docNum;
       numberEl.setAttribute('data-placeholder', docNum);
+
+      // Sinkronkan currentDocId & URL setiap kali nomor berubah (bukan cuma
+      // sekali di awal) — supaya identitas dokumen di sisi klien selalu
+      // konsisten dengan nomor yang TAMPIL, termasuk saat user mengganti
+      // Kode Sistem setelah dokumen baru dibuat.
+      currentDocId = docNum;
+      const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(docNum)}`;
+      window.history.replaceState(null, '', newUrl);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -5045,21 +5053,22 @@
 
       // Nomor dokumen dibuat OTOMATIS berdasarkan Kode Sistem yang dipilih +
       // nomor urut berikutnya dari dokumen terakhir yang tersimpan (Supabase/localStorage)
+      // (currentDocId & URL disinkronkan otomatis di dalam updateAutoDocNumber())
       updateAutoDocNumber().then(() => {
-        const numEl = document.getElementById('doc-control-num');
-        const newId = numEl ? numEl.textContent.trim() : null;
-        if (newId) {
-          currentDocId = newId;
-          const newUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(newId)}`;
-          window.history.replaceState(null, '', newUrl);
-        }
         // Pastikan field terbuka/dapat diisi sesuai peran (form pristine defaultnya
         // tidak terkunci, tapi ini memastikan banner status & tombol tanda tangan
         // konsisten dengan peran user yang sedang login)
         applyAuthUI();
         updateMetricsFromRtm();
-        // Simpan draft awal agar nomor dokumen langsung tercatat (mencegah duplikat nomor)
-        saveDocumentSilently();
+        // CATATAN: SENGAJA TIDAK auto-save ke database di sini.
+        // Kalau langsung disimpan sekarang, dokumen akan tersimpan dengan Kode
+        // Sistem DEFAULT (opsi pertama di dropdown) — SEBELUM user sempat
+        // memilih Kode Sistem yang sebenarnya. Akibatnya database kebanjiran
+        // baris kosong dengan kode sistem yang salah setiap kali dokumen baru
+        // dibuat. Dokumen baru sekarang hanya tersimpan ke database saat user
+        // benar-benar menekan "Simpan Dokumen" (atau membagikan link / tanda
+        // tangan / approve, yang semuanya sudah otomatis memicu simpan) —
+        // di titik itu Kode Sistem yang dipilih user sudah pasti benar.
       });
     }
 
