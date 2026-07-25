@@ -2447,6 +2447,9 @@
     #dot-canvas-app {
       position: fixed;
       inset: 0;
+      width: 100%;           /* WAJIB: canvas = replaced element, inset:0 saja tidak membuatnya melar */
+      height: 100%;
+      display: block;
       z-index: 0;            /* di belakang konten (home-view diberi z-index 1), di bawah watermark (2) */
       pointer-events: none;  /* tidak menghalangi klik/scroll */
     }
@@ -2454,6 +2457,9 @@
     #login-modal .login-dot-canvas {
       position: absolute;
       inset: 0;
+      width: 100%;           /* WAJIB: canvas = replaced element, inset:0 saja tidak membuatnya melar */
+      height: 100%;
+      display: block;
       z-index: 0;            /* sejajar blob (DOM order: dipasang setelah blob → dots di atas blob), card tetap z-index 1 */
       pointer-events: none;
     }
