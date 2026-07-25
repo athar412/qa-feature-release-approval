@@ -3448,19 +3448,48 @@
     // ================================================================
     //  AUTO DOCUMENT NUMBERING ENGINE
     // ================================================================
-    function updateAutoDocNumber() {
+    async function updateAutoDocNumber() {
       const prefixEl = document.getElementById('doc-system-prefix');
       const numberEl = document.getElementById('doc-control-num');
       if (!prefixEl || !numberEl) return;
       
       const prefix = prefixEl.value;
       const year = new Date().getFullYear();
+      const pattern = `${prefix}-REL-${year}-`;
+      let nextNumber = 1;
+
+      // Cari nomor tertinggi dari Supabase (sinkron antar device)
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient
+            .from('qa_documents')
+            .select('id')
+            .like('id', `${pattern}%`)
+            .order('id', { ascending: false })
+            .limit(1);
+          
+          if (!error && data && data.length > 0) {
+            // Ambil angka terakhir dari ID, misal "ECM-REL-2026-007" → 7
+            const lastId = data[0].id;
+            const parts = lastId.split('-');
+            const lastNum = parseInt(parts[parts.length - 1]) || 0;
+            nextNumber = lastNum + 1;
+          }
+          console.log(`[DocNumber] Supabase lookup: ${pattern}* → next = ${nextNumber}`);
+        } catch (err) {
+          console.warn('[DocNumber] Supabase query gagal, fallback localStorage:', err.message);
+          // Fallback ke localStorage jika Supabase error
+          nextNumber = parseInt(localStorage.getItem('holycat_qa_doc_num_' + prefix) || '0') + 1;
+        }
+      } else {
+        // Fallback jika Supabase belum tersedia
+        nextNumber = parseInt(localStorage.getItem('holycat_qa_doc_num_' + prefix) || '0') + 1;
+      }
+
+      // Simpan juga di localStorage sebagai cache/fallback
+      localStorage.setItem('holycat_qa_doc_num_' + prefix, nextNumber);
       
-      // Auto increment per kode sistem, simpan di localStorage
-      let lastNumber = parseInt(localStorage.getItem('holycat_qa_doc_num_' + prefix) || '0') + 1;
-      localStorage.setItem('holycat_qa_doc_num_' + prefix, lastNumber);
-      
-      const docNum = `${prefix}-REL-${year}-${String(lastNumber).padStart(3, '0')}`;
+      const docNum = `${pattern}${String(nextNumber).padStart(3, '0')}`;
       numberEl.textContent = docNum;
       numberEl.setAttribute('data-placeholder', docNum);
     }
