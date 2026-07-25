@@ -2801,6 +2801,7 @@
                 <th style="width:100px;">TC ID</th>
                 <th style="width:110px;">Metode</th>
                 <th style="width:100px;" class="center">Status</th>
+                <th style="width:40px;" class="center no-print"></th>
               </tr>
             </thead>
             <tbody>
@@ -2816,6 +2817,7 @@
                     <option value="N/A">N/A</option>
                   </select>
                 </td>
+                <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
               </tr>
             </tbody>
           </table>
@@ -2919,6 +2921,7 @@
                 <th style="width:90px;" class="center">Severity</th>
                 <th style="width:100px;" class="center">Status</th>
                 <th style="width:120px;">Assignee</th>
+                <th style="width:40px;" class="center no-print"></th>
               </tr>
             </thead>
             <tbody>
@@ -2942,6 +2945,7 @@
                   </select>
                 </td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Assignee..."></span></td>
+                <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
               </tr>
             </tbody>
           </table>
@@ -3006,13 +3010,14 @@
       </div>
       <div class="section-body">
         <div style="overflow-x:auto;">
-          <table class="data-table">
+          <table class="data-table" id="risk-table">
             <thead>
               <tr>
                 <th style="width:60px;">No</th>
                 <th>Deskripsi Risiko</th>
                 <th style="width:90px;" class="center">Level</th>
                 <th>Mitigasi / Catatan</th>
+                <th style="width:40px;" class="center no-print"></th>
               </tr>
             </thead>
             <tbody>
@@ -3028,10 +3033,12 @@
                   </select>
                 </td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Mitigasi..."></span></td>
+                <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
               </tr>
             </tbody>
           </table>
         </div>
+        <button class="mt-16 btn btn-outline-secondary no-print" onclick="addRiskRow()" style="width: 100%;">+ Tambah Baris Risiko</button>
       </div>
     </div>
 
@@ -4080,6 +4087,25 @@
     // ================================================================
     //  RTM TABLE ROW MANAGEMENT
     // ================================================================
+    // ================================================================
+    //  HAPUS BARIS TABEL (GENERIK — dipakai RTM, Defect, Risk Assessment)
+    // ================================================================
+    // Dipanggil dari tombol 🗑️ di setiap baris. Selalu menyisakan minimal
+    // 1 baris di tabel supaya struktur tabel tidak rusak/kosong total.
+    // Kalau baris yang dihapus ada di dalam tabel RTM, Pass Rate dihitung ulang.
+    function deleteTableRow(btn) {
+      const tr = btn.closest('tr');
+      if (!tr) return;
+      const tbody = tr.closest('tbody');
+      if (tbody && tbody.children.length <= 1) {
+        alert('Tabel harus punya minimal 1 baris. Kosongkan isinya jika tidak diperlukan, alih-alih menghapus baris terakhir.');
+        return;
+      }
+      const isRtm = !!tr.closest('#rtm-table');
+      tr.remove();
+      if (isRtm) updateMetricsFromRtm();
+    }
+
     function addRtmRow() {
       const table = document.getElementById('rtm-table');
       if (!table) return;
@@ -4099,9 +4125,37 @@
             <option value="N/A">N/A</option>
           </select>
         </td>
+        <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
       `;
       tbody.appendChild(tr);
       updateMetricsFromRtm(); // Sertakan baris baru ke perhitungan Pass Rate
+    }
+
+    // ================================================================
+    //  RISK ASSESSMENT TABLE ROW MANAGEMENT
+    // ================================================================
+    function addRiskRow() {
+      const table = document.getElementById('risk-table');
+      if (!table) return;
+      const tbody = table.querySelector('tbody');
+      if (!tbody) return;
+      const rowCount = tbody.children.length + 1;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="center">${rowCount}</td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi risiko..."></span></td>
+        <td class="center">
+          <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </td>
+        <td><span class="editable" contenteditable="true" data-placeholder="Mitigasi..."></span></td>
+        <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
     }
 
     // ================================================================
@@ -4134,6 +4188,7 @@
           </select>
         </td>
         <td><span class="editable" contenteditable="true" data-placeholder="Assignee..."></span></td>
+        <td class="center no-print"><button class="btn btn-ghost btn-sm text-danger" onclick="deleteTableRow(this)" title="Hapus Baris">🗑️</button></td>
       `;
       tbody.appendChild(tr);
     }
@@ -4158,6 +4213,34 @@
         </div>
       `;
       grid.appendChild(card);
+    }
+
+    // ================================================================
+    //  FLOWCHART UPLOAD (SEBELUMNYA HILANG — fungsi ini tidak pernah ada,
+    //  padahal sudah dipanggil dari onchange="previewFlowchart(event)" di
+    //  HTML, sehingga setiap upload gambar flowchart selalu gagal diam-diam)
+    // ================================================================
+    function previewFlowchart(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const dropArea = event.target.closest('.flowchart-area');
+      if (!dropArea) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const uploadText = dropArea.querySelector('.upload-text');
+        const uploadHint = dropArea.querySelector('.upload-hint');
+        if (uploadText) uploadText.style.display = 'none';
+        if (uploadHint) uploadHint.style.display = 'none';
+
+        let img = dropArea.querySelector('img');
+        if (!img) {
+          img = document.createElement('img');
+          dropArea.insertBefore(img, dropArea.firstChild);
+        }
+        img.src = e.target.result;
+        img.alt = file.name;
+      };
+      reader.readAsDataURL(file);
     }
 
     function previewEvidence(event, inputEl) {
@@ -4306,11 +4389,22 @@
       });
     });
 
-    async function saveDocument() {
-      if (!currentUser) { alert('Silakan login terlebih dahulu.'); return; }
+    async function saveDocument(silent = false) {
+      if (!currentUser) { alert('Silakan login terlebih dahulu.'); return { success: false, reason: 'Belum login.' }; }
       const state = getFormState();
-      await saveDocumentToCloud(state);
-      alert(`Dokumen [${state.id}] (${state.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
+      const result = await saveDocumentToCloud(state);
+      if (silent) return result;
+
+      if (result && result.success) {
+        if (result.target === 'legacy_kvdb') {
+          alert(`⚠️ Dokumen [${state.id}] tersimpan lewat jalur CADANGAN, bukan database utama (Supabase).\n\nKemungkinan ada gangguan koneksi: ${result.warning || 'tidak diketahui'}\n\nSilakan cek lagi nanti untuk memastikan data benar-benar tersinkron ke database utama.`);
+        } else {
+          alert(`✅ Dokumen [${state.id}] (${state.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
+        }
+      } else {
+        alert(`❌ GAGAL menyimpan dokumen [${state.id}] ke database!\n\nAlasan: ${result ? result.reason : 'tidak diketahui'}\n\nPerubahan Anda TIDAK tersimpan secara permanen. Silakan coba lagi, atau hubungi admin jika terus berulang.`);
+      }
+      return result;
     }
 
     
@@ -4327,12 +4421,14 @@
     // =============================================
 
     async function saveDocumentToCloud(state) {
-      if (!state || !state.id) return;
+      if (!state || !state.id) return { success: false, reason: 'Data dokumen tidak valid.' };
       
       // Save locally first
       let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
       docs[state.id] = state;
       localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+
+      let supabaseErrorMsg = null;
 
       // Attempt to save to Supabase if client is active
       if (supabaseClient) {
@@ -4353,13 +4449,16 @@
             });
           if (error) throw error;
           console.log('Supabase Save Success:', state.id);
-          return; // Skip KVDB if Supabase succeeded
+          return { success: true, target: 'supabase' }; // Skip KVDB if Supabase succeeded
         } catch (err) {
           console.warn('Supabase Save failed, falling back to KVDB:', err.message);
+          supabaseErrorMsg = err.message;
         }
+      } else {
+        supabaseErrorMsg = 'Koneksi Supabase belum aktif.';
       }
 
-      // Fallback to legacy KVDB
+      // Fallback to legacy KVDB (cadangan darurat, bukan sumber kebenaran utama)
       try {
         const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(state.id)}`, {
           method: 'POST',
@@ -4367,8 +4466,13 @@
           body: JSON.stringify(state)
         });
         console.log('Legacy Cloud DB Save Status:', response.status);
+        if (response.ok) {
+          return { success: true, target: 'legacy_kvdb', warning: supabaseErrorMsg };
+        }
+        return { success: false, reason: supabaseErrorMsg || `Cadangan gagal (status ${response.status}).` };
       } catch (err) {
         console.warn('Legacy Cloud DB Save Warning (Offline fallback):', err);
+        return { success: false, reason: supabaseErrorMsg || err.message };
       }
     }
 
@@ -4500,7 +4604,7 @@
     // ================================================================
     //  UNIFIED SINGLE MANAGER APPROVAL & REJECTION ENGINE
     // ================================================================
-    function approveDocumentAction() {
+    async function approveDocumentAction() {
       if (!currentUser) {
         alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
@@ -4526,12 +4630,16 @@
         docStatus = 'APPROVED';
         lockDocumentUI();
         updateStatusBanners();
-        saveDocument();
-        alert(" Dokumen Berhasil Disetujui & Dikunci!");
+        const result = await saveDocument(true);
+        if (result && result.success) {
+          alert(" Dokumen Berhasil Disetujui & Dikunci!");
+        } else {
+          alert(`⚠️ Status sudah ditandai DISETUJUI, TAPI GAGAL tersimpan ke database (${result ? result.reason : 'error tidak diketahui'}).\n\nSilakan tekan "Simpan Dokumen" secara manual untuk mencoba lagi, agar persetujuan ini benar-benar tercatat.`);
+        }
       }
     }
 
-    function rejectDocumentAction() {
+    async function rejectDocumentAction() {
       if (!currentUser) {
         alert("Silakan login sebagai Product Owner / Manager terlebih dahulu.");
         setElementStyle('login-modal', 'display', 'flex');
@@ -4548,8 +4656,12 @@
         docStatus = 'REJECTED';
         rejectionReason = reason.trim();
         updateStatusBanners();
-        saveDocument();
-        alert("Dokumen telah ditandai DITOLAK.");
+        const result = await saveDocument(true);
+        if (result && result.success) {
+          alert("Dokumen telah ditandai DITOLAK.");
+        } else {
+          alert(`⚠️ Status sudah ditandai DITOLAK, TAPI GAGAL tersimpan ke database (${result ? result.reason : 'error tidak diketahui'}).\n\nSilakan tekan "Simpan Dokumen" secara manual untuk mencoba lagi.`);
+        }
       }
     }
 
@@ -4693,7 +4805,7 @@
     // =============================================
     //  SHARE LINK PREVIEW POPOVER LOGIC
     // =============================================
-    function toggleSharePopover() {
+    async function toggleSharePopover() {
       const popover = document.getElementById('share-popover');
       if (!popover) return;
       const isVisible = popover.style.display === 'flex';
@@ -4703,16 +4815,44 @@
 
       if (isVisible) {
         popover.style.display = 'none';
-      } else {
-        // Generate current link URL
-        const linkInput = document.getElementById('share-link-input');
-        if (linkInput) {
-          linkInput.value = `${window.location.origin}${window.location.pathname}?id=${currentDocId}`;
-        }
-        popover.style.display = 'flex';
-        // Reset copy button text
-        const btn = document.getElementById('btn-copy-link');
-        if (btn) btn.textContent = 'Salin';
+        return;
+      }
+
+      if (!currentUser) {
+        alert('Silakan login terlebih dahulu untuk membagikan dokumen.');
+        setElementStyle('login-modal', 'display', 'flex');
+        return;
+      }
+
+      const linkInput = document.getElementById('share-link-input');
+      const copyBtn = document.getElementById('btn-copy-link');
+
+      // Tampilkan popover dulu dengan status "menyimpan..." — supaya user tahu
+      // link yang akan dibagikan mencerminkan data TERBARU, bukan data lama.
+      if (linkInput) linkInput.value = 'Menyimpan dokumen sebelum membuat link...';
+      if (copyBtn) { copyBtn.disabled = true; copyBtn.textContent = '...'; }
+      popover.style.display = 'flex';
+
+      // WAJIB: simpan dulu sebelum membuat link, supaya penerima link melihat
+      // data TERBARU (bukan versi lama/kosong jika user belum sempat klik
+      // "Simpan Dokumen" secara manual).
+      const result = await saveDocument(true);
+
+      if (copyBtn) { copyBtn.disabled = false; copyBtn.textContent = 'Salin'; }
+
+      if (!result || !result.success) {
+        if (linkInput) linkInput.value = '';
+        alert(`❌ Gagal menyimpan dokumen sebelum membuat link berbagi.\n\nAlasan: ${result ? result.reason : 'tidak diketahui'}\n\nLink TIDAK dibuat. Silakan perbaiki koneksi lalu coba lagi.`);
+        popover.style.display = 'none';
+        return;
+      }
+
+      if (result.target === 'legacy_kvdb') {
+        alert(`⚠️ Dokumen tersimpan lewat jalur cadangan (bukan Supabase). Link tetap dibuat, tapi sebaiknya cek lagi nanti untuk memastikan data sudah tersinkron penuh.\n\nDetail: ${result.warning || ''}`);
+      }
+
+      if (linkInput) {
+        linkInput.value = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(currentDocId)}`;
       }
     }
 
