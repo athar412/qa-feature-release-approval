@@ -2874,8 +2874,22 @@
               <tr>
                 <td><span class="editable" contenteditable="true" data-placeholder="BUG-001">BUG-001</span></td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi bug..."></span></td>
-                <td class="center"><span class="priority priority--high">High</span></td>
-                <td class="center"><span class="status status--pass">Closed</span></td>
+                <td class="center">
+                  <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High" selected>High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </td>
+                <td class="center">
+                  <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Closed" selected>Closed</option>
+                    <option value="Won't Fix">Won't Fix</option>
+                  </select>
+                </td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Assignee..."></span></td>
               </tr>
             </tbody>
@@ -2954,7 +2968,14 @@
               <tr>
                 <td class="center">1</td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Deskripsi risiko..."></span></td>
-                <td class="center"><span class="priority priority--medium">Medium</span></td>
+                <td class="center">
+                  <select class="form-control form-control-sm" style="width:auto; padding:2px 6px; font-size:11px;">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </td>
                 <td><span class="editable" contenteditable="true" data-placeholder="Mitigasi..."></span></td>
               </tr>
             </tbody>
@@ -3429,16 +3450,19 @@
     // ================================================================
     function updateAutoDocNumber() {
       const prefixEl = document.getElementById('doc-system-prefix');
-      const numberEl = document.getElementById('doc-number-input');
+      const numberEl = document.getElementById('doc-control-num');
       if (!prefixEl || !numberEl) return;
       
       const prefix = prefixEl.value;
       const year = new Date().getFullYear();
       
-      let lastNumber = localStorage.getItem('holycat_qa_doc_num_' + prefix) || 0;
-      lastNumber = parseInt(lastNumber) + 1;
+      // Auto increment per kode sistem, simpan di localStorage
+      let lastNumber = parseInt(localStorage.getItem('holycat_qa_doc_num_' + prefix) || '0') + 1;
+      localStorage.setItem('holycat_qa_doc_num_' + prefix, lastNumber);
       
-      numberEl.value = `${prefix}-${year}-${String(lastNumber).padStart(3, '0')}`;
+      const docNum = `${prefix}-REL-${year}-${String(lastNumber).padStart(3, '0')}`;
+      numberEl.textContent = docNum;
+      numberEl.setAttribute('data-placeholder', docNum);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
