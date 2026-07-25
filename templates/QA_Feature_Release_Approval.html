@@ -2739,10 +2739,11 @@
     /* Sembunyikan petunjuk geser tabel di desktop */
     .table-scroll-hint { display: none; }
 
-    /* Hormati preferensi pengguna: kurangi gerakan */
+    /* Hormati preferensi pengguna: kurangi gerakan (animasi & transisi CSS lain) —
+       KECUALI efek dot magnetik, yang sengaja selalu menyala sesuai permintaan,
+       terlepas dari preferensi reduced-motion / mode hemat baterai sistem. */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
-      #dot-canvas-app, #dot-canvas-login { display: none !important; }
     }
 </style>
   <!-- Supabase JS Client CDN -->
@@ -5504,13 +5505,12 @@
        - #dot-canvas-login : background overlay login (di luar popup;
                              area dalam popup otomatis tertutup card putih) */
     (function () {
-      // Aksesibilitas: hormati preferensi "kurangi gerakan" di perangkat manapun (desktop/HP).
-      // Selain itu efek TETAP AKTIF di semua ukuran layar & jenis perangkat (termasuk touch),
-      // performa/baterai di HP dijaga lewat: (1) kepadatan titik lebih jarang di layar sempit,
-      // (2) mekanisme "tidur" otomatis — begitu titik-titik sudah diam & tidak ada interaksi,
-      // loop berhenti melakukan kalkulasi/gambar berat sampai ada sentuhan/gerakan baru lagi
-      // atau tampilan (home/login) baru saja dibuka, sehingga tidak membakar CPU saat idle.
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      // Efek ini SENGAJA selalu menyala di semua kondisi — termasuk saat sistem
+      // melaporkan preferensi "kurangi gerakan" (reduced-motion) / mode hemat baterai —
+      // sesuai permintaan eksplisit. Performa tetap dijaga lewat: (1) kepadatan titik
+      // lebih jarang di layar sempit, (2) mekanisme "tidur" otomatis — begitu titik-titik
+      // sudah diam & tidak ada interaksi, loop berhenti melakukan kalkulasi/gambar berat
+      // sampai ada sentuhan/gerakan baru lagi atau tampilan (home/login) baru saja dibuka.
 
       var isTouchDevice = window.matchMedia('(pointer: coarse)').matches ||
                           window.matchMedia('(max-width: 768px)').matches;
