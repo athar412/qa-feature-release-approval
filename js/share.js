@@ -83,8 +83,8 @@ export function copyShareUrlDirect(url, btnElem) {
     }
 
 export function shareDocumentLink() {
-      const state = saveDocumentSilently();
-      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(state.id)}`;
+      const formState = saveDocumentSilently();
+      const shareUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(formState.id)}`;
       
       navigator.clipboard.writeText(shareUrl).then(() => {
         alert(`Link Berbagi Dokumen berhasil disalin:\n${shareUrl}`);

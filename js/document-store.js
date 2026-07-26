@@ -137,28 +137,28 @@ export function clearAllLocalStorageData() {
 
 export async function saveDocument(silent = false) {
       if (!state.currentUser) { alert('Silakan login terlebih dahulu.'); return { success: false, reason: 'Belum login.' }; }
-      const state = getFormState();
-      const result = await saveDocumentToCloud(state);
+      const formState = getFormState();
+      const result = await saveDocumentToCloud(formState);
       if (silent) return result;
 
       if (result && result.success) {
         if (result.target === 'legacy_kvdb') {
-          alert(`⚠️ Dokumen [${state.id}] tersimpan lewat jalur CADANGAN, bukan database utama (Supabase).\n\nKemungkinan ada gangguan koneksi: ${result.warning || 'tidak diketahui'}\n\nSilakan cek lagi nanti untuk memastikan data benar-benar tersinkron ke database utama.`);
+          alert(`⚠️ Dokumen [${formState.id}] tersimpan lewat jalur CADANGAN, bukan database utama (Supabase).\n\nKemungkinan ada gangguan koneksi: ${result.warning || 'tidak diketahui'}\n\nSilakan cek lagi nanti untuk memastikan data benar-benar tersinkron ke database utama.`);
         } else {
-          alert(`✅ Dokumen [${state.id}] (${state.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
+          alert(`✅ Dokumen [${formState.id}] (${formState.docName}) berhasil disimpan & disinkronkan ke Cloud Database!`);
         }
       } else {
-        alert(`❌ GAGAL menyimpan dokumen [${state.id}] ke database!\n\nAlasan: ${result ? result.reason : 'tidak diketahui'}\n\nPerubahan Anda TIDAK tersimpan secara permanen. Silakan coba lagi, atau hubungi admin jika terus berulang.`);
+        alert(`❌ GAGAL menyimpan dokumen [${formState.id}] ke database!\n\nAlasan: ${result ? result.reason : 'tidak diketahui'}\n\nPerubahan Anda TIDAK tersimpan secara permanen. Silakan coba lagi, atau hubungi admin jika terus berulang.`);
       }
       return result;
     }
 
-export async function saveDocumentToCloud(state) {
-      if (!state || !state.id) return { success: false, reason: 'Data dokumen tidak valid.' };
+export async function saveDocumentToCloud(formState) {
+      if (!formState || !formState.id) return { success: false, reason: 'Data dokumen tidak valid.' };
       
       // Save locally first
       let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      docs[state.id] = state;
+      docs[formState.id] = formState;
       localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
 
       let supabaseErrorMsg = null;
@@ -166,22 +166,22 @@ export async function saveDocumentToCloud(state) {
       // Attempt to save to Supabase if client is active
       if (state.supabaseClient) {
         try {
-          const sysCode = state.id.split('-')[0] || 'QA';
+          const sysCode = formState.id.split('-')[0] || 'QA';
           const { data, error } = await state.supabaseClient
             .from('qa_documents')
             .upsert({
-              id: state.id,
+              id: formState.id,
               system_code: sysCode,
-              doc_title: state.docName || 'Formulir Persetujuan Rilis',
+              doc_title: formState.docName || 'Formulir Persetujuan Rilis',
               doc_version: '1.0',
               release_version: '1.0',
               sprint: '1',
-              status: state.status || 'PENDING',
-              document_data: state,
+              status: formState.status || 'PENDING',
+              document_data: formState,
               updated_at: new Date().toISOString()
             });
           if (error) throw error;
-          console.log('Supabase Save Success:', state.id);
+          console.log('Supabase Save Success:', formState.id);
           return { success: true, target: 'supabase' }; // Skip KVDB if Supabase succeeded
         } catch (err) {
           console.warn('Supabase Save failed, falling back to KVDB:', err.message);
@@ -193,7 +193,7 @@ export async function saveDocumentToCloud(state) {
 
       // Fallback to legacy KVDB (cadangan darurat, bukan sumber kebenaran utama)
       try {
-        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(state.id)}`, {
+        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(formState.id)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(state)
@@ -261,8 +261,8 @@ export async function loadDocumentFromCloud(docId) {
     }
 
 export function saveDocumentSilently() {
-      const state = getFormState();
-      saveDocumentToCloud(state);
+      const formState = getFormState();
+      saveDocumentToCloud(formState);
       return state;
     }
 
@@ -284,7 +284,7 @@ export function loadDocument(docId) {
 export function renderLoadedDoc(data) {
       if (!data) return;
       state.docStatus = data.status || 'PENDING';
-      state.rejectionReason = data.state.rejectionReason || '';
+      state.rejectionReason = data.rejectionReason || '';
       
       if (data.html) {
         document.querySelector('.page-container').innerHTML = data.html;
