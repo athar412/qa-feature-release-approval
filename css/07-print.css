@@ -36,8 +36,8 @@
         overflow-wrap: anywhere;
       }
       /* Sel teks di tabel tidak perlu tinggi minimum ala sentuhan saat dicetak */
-      .data-table .editable[contenteditable="true"],
-      .data-table .editable {
+      .editable[contenteditable="true"],
+      .editable {
         font-size: 10px !important;
         min-height: 0 !important;
         padding: 2px 4px !important;

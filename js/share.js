@@ -67,6 +67,9 @@ export function executeShareCopy() {
             btn.textContent = 'Salin';
           }, 2000);
         }
+      }).catch(err => {
+        console.warn("Clipboard failed:", err);
+        prompt("Salin link berbagi di bawah ini:", linkInput.value);
       });
     }
 
@@ -79,6 +82,9 @@ export function copyShareUrlDirect(url, btnElem) {
           btnElem.textContent = origText;
           btnElem.style.borderColor = '';
         }, 2000);
+      }).catch(err => {
+        console.warn("Clipboard failed:", err);
+        prompt("Salin link berbagi di bawah ini:", url);
       });
     }
 
