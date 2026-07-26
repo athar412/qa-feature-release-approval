@@ -2,7 +2,7 @@ export const state = {
   supabaseClient: null,
   db: null,
   currentUser: null,
-  currentDocId: 'QA-REL-2026-001',
+  currentDocId: null,
   docStatus: 'PENDING',
   rejectionReason: '',
   activeSignatureRole: null,

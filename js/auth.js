@@ -134,9 +134,8 @@ export function applyAuthUI() {
       }
 
       // STRICT VIEW CONTROL FOR NAVBAR ACTION BUTTONS
-      // Gunakan form-view sebagai indikator: jika form-view visible = sedang di form dokumen
-      const formViewEl = document.getElementById('form-view');
-      const isFormActive = formViewEl && formViewEl.style.display !== 'none';
+      // Gunakan state.currentDocId: jika ada docId = sedang di form, tidak ada = di home
+      const isFormActive = !!state.currentDocId;
       if (!isFormActive) {
         setElementStyle('btn-save-doc', 'display', 'none');
         const printBtn = document.getElementById('btn-print-doc');
