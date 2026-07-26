@@ -1,0 +1,59 @@
+=== PRISTINE ===
+const PRISTINE_PAGE_HTML = (function () {
+      const el = document.querySelector('.page-container');
+      return el ? el.innerHTML : '';
+    })();
+
+=== SUPABASE ===
+let supabaseClient = null;
+    try {
+      if (typeof supabase !== 'undefined' && SUPABASE_URL && !SUPABASE_URL.includes('YOUR_PROJECT_ID')) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log("Supabase client active.");
+      }
+    } catch (e) {
+      console.warn("Supabase credentials not configured yet, falling back to local storage.", e);
+    }
+
+    // =============================================
+    //  FIREBASE & LOCALSTORAGE BACKEND SETUP
+    // =============================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyDemoKeyForPublicForm2026AQ",
+      authDomain: "holycat-qa-approval.firebaseapp.com",
+      projectId: "holycat-qa-approval",
+      storageBucket: "holycat-qa-approval.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:demo123456"
+    };
+
+    let db = null;
+    try {
+      if (window.firebase && firebase.initializeApp) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+      }
+    } catch(e) {
+      console.log('Firebase fallback to LocalStorage');
+    }
+
+=== FIREBASE ===
+const firebaseConfig = {
+      apiKey: "AIzaSyDemoKeyForPublicForm2026AQ",
+      authDomain: "holycat-qa-approval.firebaseapp.com",
+      projectId: "holycat-qa-approval",
+      storageBucket: "holycat-qa-approval.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:demo123456"
+    };
+
+    let db = null;
+    try {
+      if (window.firebase && firebase.initializeApp) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+      }
+    } catch(e) {
+      console.log('Firebase fallback to LocalStorage');
+    }
+
