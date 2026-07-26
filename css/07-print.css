@@ -1,0 +1,175 @@
+    /*  PERBAIKAN HASIL CETAK / EKSPOR PDF                              */
+    /*  Diletakkan paling akhir agar menang cascade atas semua aturan   */
+    /*  sebelumnya (termasuk gaya mobile & inline style).               */
+    /* ═══════════════════════════════════════════════════════════════ */
+    @media print {
+
+      /* ── A. NETRALKAN GAYA MOBILE YANG IKUT AKTIF SAAT MENCETAK ──
+         AKAR MASALAH: saat mencetak, lebar viewport = lebar halaman A4 dikurangi
+         margin ≈ 703px CSS px. Angka itu MASUK ke @media (max-width: 768px),
+         sehingga seluruh gaya mobile ikut terpakai di PDF. Efeknya di PDF:
+         (1) petunjuk "Geser tabel ke samping ↔" ikut tercetak,
+         (2) tabel terkurung dalam kotak scroll horizontal → kolom paling kanan
+             (mis. STATUS) terpotong di tepi halaman + muncul batang scrollbar. */
+      .table-scroll-hint { display: none !important; }
+
+      .section-body,
+      .section-body:has(table),
+      .section-body:has(.data-table),
+      .section-body:has(.signoff-table),
+      .section-body:has(.revision-table) {
+        overflow: visible !important;
+        overflow-x: visible !important;
+      }
+      .data-table,
+      .signoff-table,
+      .revision-table {
+        min-width: 0 !important;
+        width: 100% !important;
+        table-layout: fixed !important;
+      }
+      .data-table th,
+      .data-table td {
+        padding: 6px 8px !important;
+        font-size: 10px !important;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      /* Sel teks di tabel tidak perlu tinggi minimum ala sentuhan saat dicetak */
+      .data-table .editable[contenteditable="true"],
+      .data-table .editable {
+        font-size: 10px !important;
+        min-height: 0 !important;
+        padding: 2px 4px !important;
+        background: transparent !important;
+        border: none !important;
+      }
+
+      /* ── B. DROPDOWN → LABEL STATUS BERWARNA ──
+         Di layar elemen ini <select>. Di PDF panah dropdown tidak punya arti
+         (tidak bisa diklik) dan semua nilai tampil abu-abu seragam sehingga
+         sulit dibaca sekilas. Di sini panah dihilangkan dan nilainya diberi
+         warna sesuai tingkat status — HIGH/Fail merah, Medium kuning,
+         Pass/Low/Closed hijau. */
+      select,
+      select.form-control,
+      select.form-control-sm,
+      select.doc-control-value {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-image: none !important;
+        border: 1px solid rgba(0, 0, 0, 0.14) !important;
+        border-radius: 6px !important;
+        padding: 3px 10px !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.3px;
+        text-align: center !important;
+        text-align-last: center !important;
+        width: auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        line-height: 1.4 !important;
+        color: #111827 !important;
+        background-color: #F3F4F6 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      select::-ms-expand { display: none !important; }
+
+      /* MERAH — kritis / gagal / ditolak */
+      select[data-val="Critical"],
+      select[data-val="High"],
+      select[data-val="HIGH"],
+      select[data-val="Fail"],
+      select[data-val="FAILED"],
+      select[data-val="REJECTED"] {
+        color: #991B1B !important;
+        background-color: #FEE2E2 !important;
+        border-color: rgba(153, 27, 27, 0.35) !important;
+      }
+      /* KUNING — perlu perhatian / belum selesai */
+      select[data-val="Medium"],
+      select[data-val="MEDIUM"],
+      select[data-val="Open"],
+      select[data-val="In Progress"],
+      select[data-val="N/A"],
+      select[data-val="PENDING"],
+      select[data-val="SKIPPED"] {
+        color: #92400E !important;
+        background-color: #FEF3C7 !important;
+        border-color: rgba(146, 64, 14, 0.32) !important;
+      }
+      /* HIJAU — aman / lulus / selesai */
+      select[data-val="Low"],
+      select[data-val="LOW"],
+      select[data-val="Pass"],
+      select[data-val="PASSED"],
+      select[data-val="Closed"],
+      select[data-val="APPROVED"] {
+        color: #166534 !important;
+        background-color: #DCFCE7 !important;
+        border-color: rgba(22, 101, 52, 0.32) !important;
+      }
+      /* ABU — sengaja tidak dikerjakan */
+      select[data-val="Won't Fix"] {
+        color: #4B5563 !important;
+        background-color: #E5E7EB !important;
+        border-color: rgba(75, 85, 99, 0.3) !important;
+      }
+
+      /* ── C. FLOWCHART: HILANGKAN HALAMAN KOSONG SEBELUM GAMBAR ──
+         AKAR MASALAH: .section diberi `break-inside: avoid !important`. Gambar
+         flowchart berupa diagram vertikal panjang bisa jauh lebih tinggi dari
+         satu halaman. Karena gambar adalah kotak yang tidak bisa dipecah, dan
+         section-nya dilarang terpotong, browser terus MENDORONG gambar ke
+         halaman berikutnya — menghasilkan sisa halaman kosong + satu halaman
+         kosong penuh sebelum gambar akhirnya muncul (persis yang terjadi di
+         PDF: bagian 5 mulai di halaman 7, halaman 8 kosong, gambar baru di 9).
+
+         SOLUSI: tinggi gambar dibatasi agar pasti muat dalam satu halaman A4,
+         sehingga tidak ada lagi dorongan antar-halaman. Rasio aspek tetap
+         terjaga (width/height auto), dan seluruh diagram terlihat utuh dalam
+         satu halaman — bukan terpotong di tengah node seperti sebelumnya. */
+      .flowchart-area {
+        border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        background: #FFFFFF !important;
+        padding: 6px !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .flowchart-area img {
+        max-width: 100% !important;
+        max-height: 215mm !important;   /* muat 1 halaman A4 termasuk header section */
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+        display: block !important;
+        margin: 0 auto !important;
+      }
+      /* Ajakan unggah tidak relevan di dokumen cetak */
+      .flowchart-area .upload-text,
+      .flowchart-area .upload-hint,
+      .evidence-img-area .upload-text { display: none !important; }
+
+      /* Gambar bukti pengujian juga dijaga agar tidak memicu dorongan halaman */
+      .evidence-card { break-inside: avoid !important; page-break-inside: avoid !important; }
+      .evidence-card img { max-height: 90mm !important; object-fit: contain !important; }
+      /* ── D. KEPUTUSAN RILIS: HANYA CETAK YANG DIPILIH ──
+         Di layar kedua kartu ditampilkan agar bisa dipilih. Di PDF, mencetak
+         opsi yang TIDAK dipilih justru membingungkan pembaca dokumen resmi —
+         jadi hanya kartu terpilih yang ikut tercetak, melebar penuh. */
+      .decision-card:not(:has(input:checked)) {
+        display: none !important;
+      }
+      .decision-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .decision-card:has(input:checked) {
+        border-width: 2px !important;
+        padding: 14px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }

@@ -1,0 +1,342 @@
+    /*  OPTIMASI MOBILE MENYELURUH (FINAL LAYER — MENANG CASCADE)       */
+    /*  Target: ≤768px (tablet kecil/HP) & ≤480px (HP)                  */
+    /* ═══════════════════════════════════════════════════════════════ */
+
+    html {
+      -webkit-text-size-adjust: 100%; /* Cegah iOS memperbesar teks otomatis saat rotasi */
+      text-size-adjust: 100%;
+    }
+    * { -webkit-tap-highlight-color: transparent; } /* Hilangkan kilat abu-abu saat tap */
+
+    @media (max-width: 768px) {
+
+      /* ── PERFORMA: efek dekoratif berat lain tetap disederhanakan di HP ──
+         Dot cursor magnetik TIDAK lagi dimatikan di sini — sekarang tetap
+         tampil & interaktif (ikut jari saat disentuh), tapi diatur hemat
+         baterai lewat JS: kepadatan titik dikurangi & animasi otomatis
+         berhenti saat tidak ada interaksi (lihat skrip HOLYCAT DOT CURSOR). */
+      .home-hero::before,
+      .home-hero::after {
+        width: 220px !important; height: 220px !important;
+        filter: blur(50px) !important;
+        opacity: 0.25 !important;
+      }
+      .login-blob { filter: blur(60px) !important; }
+      .login-blob.blob-green { width: 260px !important; height: 260px !important; top: -90px !important; left: -90px !important; }
+      .login-blob.blob-amber { width: 220px !important; height: 220px !important; bottom: -80px !important; right: -70px !important; }
+      .stat-card:hover, .doc-card:hover, .btn-primary:hover, .btn-hero-primary:hover { transform: none !important; }
+
+      /* ── BODY & NAVBAR (safe-area untuk perangkat ber-notch) ── */
+      body { padding-top: calc(56px + env(safe-area-inset-top, 0px)) !important; }
+      .top-navbar {
+        height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+        padding-top: env(safe-area-inset-top, 0px) !important;
+        padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+      }
+      .nav-actions { top: calc(56px + env(safe-area-inset-top, 0px)) !important; max-height: calc(100vh - 56px - env(safe-area-inset-top, 0px)) !important; }
+      .nav-brand img { height: 26px !important; }
+
+      /* Target sentuh nyaman (min. 42px) untuk semua tombol di drawer */
+      .nav-actions .btn,
+      .nav-actions .history-popover-wrapper > button,
+      .nav-actions .share-popover-wrapper > button {
+        min-height: 42px !important;
+        font-size: 13px !important;
+      }
+      .hamburger-btn { width: 42px !important; height: 42px !important; }
+
+      /* ── HOME / DASHBOARD ── */
+      #home-view { padding: 16px 12px calc(24px + env(safe-area-inset-bottom, 0px)) 12px !important; }
+      .home-hero {
+        padding: 32px 18px !important;
+        border-radius: 16px !important;
+        margin-bottom: 18px !important;
+      }
+      .home-hero h1 { font-size: 1.45rem !important; line-height: 1.25 !important; }
+      .home-hero p { font-size: 0.9rem !important; margin-bottom: 18px !important; }
+      .home-action-btns { flex-direction: column; gap: 10px !important; width: 100%; }
+      .btn-hero-primary, .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+        min-height: 46px;
+        font-size: 0.95rem !important;
+      }
+
+      .dashboard-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-bottom: 18px !important;
+      }
+      .stat-card { padding: 12px !important; gap: 10px !important; border-radius: 12px !important; }
+      .stat-icon { width: 36px !important; height: 36px !important; font-size: 1rem !important; border-radius: 10px !important; }
+      .stat-info .value { font-size: 1.2rem !important; }
+      .stat-info .label { font-size: 0.7rem !important; }
+
+      .home-table-container { padding: 14px 12px !important; border-radius: 14px !important; }
+      .home-table-header { flex-direction: column; align-items: stretch !important; gap: 10px !important; margin-bottom: 14px !important; }
+      .home-table-title { font-size: 1rem !important; }
+      .home-search-input { width: 100% !important; min-height: 42px; font-size: 16px !important; /* 16px cegah auto-zoom iOS */ }
+      .recent-docs-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+      .doc-card { padding: 14px !important; }
+      .doc-card-actions { flex-wrap: wrap; }
+      .doc-card-actions .btn { flex: 1 1 auto; justify-content: center; min-height: 38px; }
+
+      /* ── FORM VIEW / DOKUMEN ── */
+      .page-container {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding: 10px 10px calc(28px + env(safe-area-inset-bottom, 0px)) 10px !important;
+        gap: 12px !important;
+        box-shadow: none !important;
+      }
+      .doc-header { flex-direction: column; align-items: flex-start !important; gap: 12px; padding: 12px 0 14px 0 !important; }
+      .doc-header-logo-container { justify-content: flex-start !important; }
+      .doc-header-logo-container img, .header-main-logo { max-height: 40px !important; height: 40px !important; }
+      .doc-title { font-size: 16px !important; }
+
+      .status-banner { flex-wrap: wrap; gap: 6px; line-height: 1.4; }
+
+      .doc-control { padding: 14px !important; }
+      .doc-control-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+      .section-header { padding: 12px 14px !important; }
+      .section-body { padding: 12px !important; }
+
+      /* Input nyaman disentuh + font 16px agar iOS tidak auto-zoom saat fokus */
+      .form-control, .form-control-sm, select.form-control,
+      .doc-control-value, .editable-area, .editable[contenteditable="true"] {
+        font-size: 16px !important;
+        min-height: 42px;
+        padding: 9px 12px !important;
+      }
+      .editable-area { min-height: 84px !important; line-height: 1.55 !important; }
+      .form-group label, .inline-label, .doc-control-label { font-size: 11px !important; }
+
+      /* Bidang pada kartu bukti juga contenteditable tapi TIDAK memakai kelas
+         .editable, sehingga lolos dari aturan di atas. Ikut dinaikkan ke 16px
+         supaya iOS tidak auto-zoom saat diketik. Aman karena di mobile
+         .evidence-grid jadi 1 kolom (kartu selebar layar). */
+      .evidence-meta { padding: 10px 12px !important; }
+      .evidence-id {
+        font-size: 16px !important;
+        min-height: 34px;
+        padding: 6px 8px !important;
+        margin-bottom: 4px !important;
+      }
+      .evidence-desc {
+        font-size: 16px !important;
+        min-height: 44px;
+        padding: 6px 8px !important;
+        line-height: 1.45 !important;
+      }
+
+      /* ── TABEL: geser horizontal dengan petunjuk visual ── */
+      .section-body:has(.data-table),
+      .section-body:has(.signoff-table),
+      .section-body:has(.revision-table) {
+        position: relative;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-x: contain;
+        border-radius: 0 0 12px 12px;
+      }
+      .data-table th, .data-table td { padding: 9px 10px !important; }
+      .data-table td { font-size: 12px !important; }
+      .status, .priority { font-size: 10px !important; padding: 5px 10px !important; white-space: nowrap; }
+
+      /* Petunjuk "geser" kecil di atas tabel */
+      .table-scroll-hint {
+        display: block !important;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--text-subtle);
+        text-align: right;
+        padding: 4px 12px 0 0;
+        letter-spacing: 0.3px;
+      }
+
+      /* ── METRIK & UPLOAD ── */
+      .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; margin-bottom: 14px !important; }
+      .metric-value { font-size: 22px !important; }
+      .pass-rate-container { padding: 14px !important; }
+      .flowchart-area { padding: 16px 12px !important; }
+      .evidence-grid { grid-template-columns: 1fr !important; }
+      .evidence-img-area { height: 150px !important; }
+
+      /* ── KEPUTUSAN & TANDA TANGAN ── */
+      .decision-grid { grid-template-columns: 1fr !important; }
+      .decision-card { padding: 14px !important; min-height: 56px; }
+      .btn-sig-trigger { min-height: 40px !important; width: 100%; justify-content: center; }
+      #approver-action-box { padding: 14px !important; }
+      #approver-action-box .btn { width: 100%; justify-content: center; min-height: 44px; margin-top: 6px; }
+
+      /* ── MODAL: penuh, bisa discroll, aman dari keyboard ── */
+      .modal-overlay {
+        padding: 12px !important;
+        align-items: flex-start !important;
+        overflow-y: auto;
+        padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
+        padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+      }
+      .modal-card, .modal-card.modal-lg {
+        max-width: 100% !important;
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: auto 0;
+        border-radius: 16px !important;
+      }
+      .modal-body { padding: 14px !important; }
+      .quick-login-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+      .quick-login-grid .btn { min-height: 42px; }
+      #login-modal .input-icon-wrap .form-control { font-size: 16px !important; }
+      .login-title { font-size: 24px !important; }
+      .login-logo { height: 60px !important; margin-bottom: 14px !important; }
+      #signature-canvas { height: 200px !important; }
+      .modal-actions-row { flex-wrap: wrap; gap: 8px !important; }
+      .modal-actions-row .btn { flex: 1 1 45%; justify-content: center; min-height: 44px; }
+
+      /* ── POPOVER & LAIN-LAIN ── */
+      .history-popover .popover-list { max-height: 45vh !important; }
+      .history-popover .popover-item { padding: 12px !important; }
+      .filter-bar { grid-template-columns: 1fr !important; }
+      .doc-watermark { background-size: 85% !important; }
+    }
+
+    /* ── HP KECIL (≤480px): kepadatan ekstra ── */
+    @media (max-width: 480px) {
+      .dashboard-stats-grid { gap: 8px !important; }
+      .stat-card { flex-direction: row; padding: 10px !important; }
+      .home-hero { padding: 26px 14px !important; }
+      .home-hero h1 { font-size: 1.3rem !important; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .metric-card { padding: 12px !important; }
+      .doc-title { font-size: 15px !important; }
+      .section-title { font-size: 12.5px !important; }
+      .page-container { padding-left: 8px !important; padding-right: 8px !important; }
+      .modal-actions-row .btn { flex: 1 1 100%; }
+    }
+
+    /* ── HP LANDSCAPE: modal jangan kepotong ── */
+    @media (max-height: 480px) and (orientation: landscape) {
+      .modal-overlay { align-items: flex-start !important; }
+      .modal-card { max-height: calc(100dvh - 16px); }
+      #signature-canvas { height: 150px !important; }
+      .login-logo { height: 44px !important; margin-bottom: 8px !important; }
+    }
+
+    /* Sembunyikan petunjuk geser tabel di desktop */
+    .table-scroll-hint { display: none; }
+
+    /* ═══════════════════════════════════════════════════════════════ */
+    /*  LAPISAN FINAL — DASHBOARD MELAYANG & NAVBAR RAPI                */
+    /* ═══════════════════════════════════════════════════════════════ */
+
+    /* ── 0. HERO "MELAYANG" TANPA KOTAK BANNER ──
+       Latar hero lama OPAQUE (#f0f4f8 terang / #232323 gelap) + lapisan blur
+       glassmorphism + 4 blob dekoratif → menutup total efek dot magnetik di area
+       terbesar dashboard. Semua dimatikan di sini agar dot terlihat menyapu penuh.
+
+       CATATAN DESAIN: subtitle dihapus (isinya mengulang informasi yang sudah jelas
+       dari konteks), TAPI judul <h1> sengaja DIPERTAHANKAN — ini satu-satunya
+       heading utama halaman. Menghapusnya membuat dashboard kehilangan penanda
+       "halaman apa ini" saat link dibagikan, dan menghilangkan struktur heading
+       yang dipakai pembaca layar (screen reader) untuk navigasi. Teksnya sudah
+       tipis & transparan terhadap background, jadi hampir tidak menutupi dot. */
+    .home-hero,
+    [data-theme="light"] .home-hero,
+    [data-theme="dark"] .home-hero {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      overflow: visible !important;
+      text-align: center;
+    }
+    /* Blob dekoratif (lingkaran blur) ikut dimatikan — ini penutup dot terbesar kedua */
+    .home-hero::before,
+    .home-hero::after { display: none !important; content: none !important; }
+
+    /* Ukuran & jarak: HANYA desktop, supaya tidak menimpa aturan mobile
+       (di HP judul tetap 1.45rem / 1.3rem dan padding lebih rapat). */
+    @media (min-width: 769px) {
+      .home-hero {
+        padding: 44px 20px 36px !important;
+        margin-bottom: 8px !important;
+      }
+      .home-hero h1 {
+        font-size: 2.1rem !important;
+        margin-bottom: 26px !important;
+        line-height: 1.15;
+      }
+    }
+
+    /* ── 1. DAFTAR DOKUMEN "MELAYANG" DI ATAS BACKGROUND ──
+       Kotak solid pembungkus dilepas supaya efek dot magnetik di belakang
+       terlihat menyapu seluruh area dashboard (sebelumnya tertutup total).
+       Kartu dokumen (.doc-card) SENGAJA tetap punya latar sendiri → teks
+       judul/ID/tanggal tetap kontras & mudah dibaca.
+       Selektor ID+class dipakai agar menang atas aturan mobile ber-!important. */
+    #documents-board-section.home-table-container {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      margin-top: 28px;
+    }
+    /* Judul & search bar: dibiarkan rata kiri tanpa indent agar sejajar sempurna
+       dengan kartu statistik di atas dan kartu dokumen di bawahnya */
+    #documents-board-section .home-table-header {
+      margin-bottom: 16px;
+    }
+    /* Search bar tetap solid (kontrol input harus jelas terlihat sbg elemen interaktif) */
+    #documents-board-section .home-search-input {
+      background: var(--bg-card);
+      box-shadow: 0 1px 2px var(--hc-shadow-soft);
+    }
+
+    /* ── 2. NAVBAR: TATA LETAK LEBIH RAPI (khusus desktop) ──
+       Dibatasi ke ≥769px supaya TIDAK menimpa aturan drawer hamburger di mobile
+       (yang memang perlu tombol full-width & tinggi 36px). */
+    @media (min-width: 769px) {
+      /* Sebelumnya keempat elemen (brand / info pengguna / hamburger / tombol aksi)
+         tersebar merata karena space-between → terlihat "berjauhan" tanpa maksud.
+         Sekarang: brand + info pengguna mengelompok di KIRI, seluruh tombol aksi
+         rapat di KANAN. margin-right:auto menyerap semua ruang kosong di tengah. */
+      .top-navbar { gap: 10px; }
+      .nav-user-info { margin-right: auto; }
+
+      /* Jarak antar tombol aksi sedikit dirapatkan agar terbaca sebagai satu grup */
+      .nav-actions { gap: 8px; }
+
+      /* Beri jarak lebih lega setelah tombol Beranda, sebagai pemisah visual halus
+         antara "navigasi" dan "aksi dokumen" — tanpa garis, karena tombolnya solid
+         hijau (garis akan terlihat seperti terpotong). */
+      #nav-btn-home { margin-right: 14px !important; }
+
+      /* Semua tombol navbar disamakan tingginya supaya barisnya benar-benar lurus
+         (sebelumnya tombol ikon tema 20px vs tombol berteks 22px → terlihat
+         sedikit "bergerigi"). box-sizing global sudah border-box, jadi tinggi
+         tetap ini aman terhadap padding/border. */
+      .nav-actions .btn { height: 26px; }
+
+      /* Tombol ikon (tema) dibuat persegi & sejajar dengan tombol berteks di sebelahnya */
+      #theme-toggle {
+        width: 30px;
+        padding: 0;
+        flex-shrink: 0;
+      }
+    }
+
+    /* Hormati preferensi pengguna: kurangi gerakan (animasi & transisi CSS lain) —
+       KECUALI efek dot magnetik, yang sengaja selalu menyala sesuai permintaan,
+       terlepas dari preferensi reduced-motion / mode hemat baterai sistem. */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }    /* ═══════════════════════════════════════════════════════════════ */

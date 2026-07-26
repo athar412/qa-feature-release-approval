@@ -1,0 +1,1101 @@
+    /* HOME VIEW & DASHBOARD SYSTEM */
+    #home-view {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .home-hero {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(147, 51, 234, 0.04) 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .home-hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .home-hero p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 28px auto;
+      line-height: 1.6;
+    }
+
+    .home-action-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background: var(--primary);
+      color: #ffffff !important;
+      font-weight: 600;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hero-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-hero-secondary {
+      background: var(--bg-card);
+      color: var(--text-main) !important;
+      border: 1px solid var(--border);
+      font-weight: 600;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hero-secondary:hover {
+      background: var(--bg-app);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .dashboard-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .stat-icon.total { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
+    .stat-icon.approved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+    .stat-icon.pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .stat-icon.rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+    .stat-info .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+    }
+
+    .stat-info .label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .home-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .home-table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .home-table-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .home-search-input {
+      background: var(--bg-app);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      width: 240px;
+      outline: none;
+    }
+
+    .home-search-input:focus {
+      border-color: var(--primary);
+    }
+
+    .recent-docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .doc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .doc-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .doc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .doc-card-id {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(79, 70, 229, 0.08);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .doc-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .doc-card-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .doc-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+
+    /* HIGH CONTRAST LIGHT MODE STYLING FOR HERO & HOME DASHBOARD */
+    [data-theme="light"] .hero-section {
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%) !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08) !important;
+    }
+    
+    [data-theme="light"] .hero-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.02em !important;
+    }
+
+    [data-theme="light"] .hero-subtitle {
+      color: #334155 !important;
+      font-weight: 500 !important;
+      font-size: 15px !important;
+      line-height: 1.6 !important;
+    }
+
+    /* HERO BUTTONS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .btn-hero-primary {
+      background-color: #4338ca !important;
+      color: #ffffff !important;
+      border: 1px solid #3730a3 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(67, 56, 202, 0.35) !important;
+    }
+    [data-theme="light"] .btn-hero-primary:hover {
+      background-color: #3730a3 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px);
+    }
+
+    [data-theme="light"] .btn-hero-secondary {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border: 2px solid #94a3b8 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+    }
+    [data-theme="light"] .btn-hero-secondary:hover {
+      background-color: #f1f5f9 !important;
+      color: #0284c7 !important;
+      border-color: #0284c7 !important;
+    }
+
+    /* STAT CARDS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .stat-card {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .stat-number {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+    [data-theme="light"] .stat-label {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+
+    /* DOC CARDS LIGHT MODE CONTRAST FIX */
+    [data-theme="light"] .doc-card {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .doc-card:hover {
+      border-color: #6366f1 !important;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.15) !important;
+    }
+    [data-theme="light"] .doc-card-title {
+      color: #0f172a !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="light"] .doc-card-id {
+      color: #475569 !important;
+      font-weight: 700 !important;
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    [data-theme="light"] .doc-card-meta {
+      color: #475569 !important;
+    }
+    [data-theme="light"] .home-section-title {
+      color: #0f172a !important;
+      font-weight: 800 !important;
+    }
+
+    /* NAVBAR LIGHT MODE HIGH CONTRAST */
+    [data-theme="light"] .top-navbar {
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+      box-shadow: none !important;
+    }
+
+    [data-theme="dark"] .top-navbar {
+      background: rgba(43, 43, 43, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+      box-shadow: none !important;
+    }
+    [data-theme="light"] .nav-app-name {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .nav-user-info {
+      color: #1e293b !important;
+      background-color: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      font-weight: 600 !important;
+    }
+
+
+    /* MOBILE HORIZONTAL TABLE SCROLL FIX */
+    .section-body {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      max-width: 100% !important;
+    }
+
+    @media (max-width: 768px) {
+      .signoff-table,
+      .revision-table,
+      .data-table {
+        min-width: 640px !important; /* Ensures mobile users can swipe horizontal and click all signature buttons */
+        display: table !important;
+      }
+      .signoff-cell {
+        min-width: 140px !important;
+      }
+      .btn-sig-trigger {
+        font-size: 11px !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+      }
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════ */
+    /*  HOLYCAT DESIGN SYSTEM — FULL UI OVERHAUL                        */
+    /*  Diadaptasi dari holycat-frontend-ecommerce (globals.css)        */
+    /*  Primary #44af7c · Secondary #ffbf00 · Dark #2b2b2b              */
+    /* ═══════════════════════════════════════════════════════════════ */
+
+    :root, [data-theme="light"] {
+      /* Holycat Core Tokens */
+      --hc-primary: #44af7c;
+      --hc-primary-hover: #379568;
+      --hc-primary-pressed: #368f63;
+      --hc-primary-text: #2b7a52;
+      --hc-primary-soft: #e8f5ef;
+      --hc-primary-pale: #f4fbf7;
+      --hc-primary-mist: #f0fbf6;
+      --hc-primary-border: #9fd8be;
+      --hc-primary-border-soft: #bfe4d1;
+      --hc-primary-alpha: rgba(68, 175, 124, 0.6);
+      --hc-primary-glow: rgba(68, 175, 124, 0.15);
+      --hc-secondary: #ffbf00;
+      --hc-secondary-soft: #fff7e0;
+      --hc-amber-deep: #b45309;
+      --hc-dark: #2b2b2b;
+      --hc-danger: #ef4444;
+      --hc-danger-soft: #fef2f2;
+      --hc-blue: #2563eb;
+      --hc-blue-soft: #eff6ff;
+      --hc-surface-page: #f9fafb;
+      --hc-surface-muted: #f3f4f6;
+      --hc-surface-bluegray: #f0f4f8;
+      --hc-border: #e5e7eb;
+      --hc-text-muted: #6b7280;
+      --hc-gray-700: #374151;
+      --hc-shadow-soft: rgba(0, 0, 0, 0.05);
+      --hc-card: #ffffff;
+      --hc-font-lilita: 'Lilita One', cursive;
+
+      /* Remap token lama app QA → palet Holycat (agar seluruh komponen ikut berubah) */
+      --bg-app: var(--hc-surface-page);
+      --bg-card: #ffffff;
+      --bg-card-hover: var(--hc-primary-pale);
+      --bg-input: #f9fafb;
+      --bg-input-focus: #ffffff;
+      --bg-sidebar: var(--hc-primary-pale);
+      --border-subtle: #eeeeee;
+      --border-card: var(--hc-border);
+      --border-strong: #d1d5db;
+      --border: var(--hc-border);
+      --text-main: var(--hc-dark);
+      --text-muted: var(--hc-text-muted);
+      --text-subtle: #9ca3af;
+      --linear-indigo: var(--hc-primary);
+      --linear-indigo-hover: var(--hc-primary-hover);
+      --linear-indigo-glow: var(--hc-primary-glow);
+      --linear-green: var(--hc-primary);
+      --linear-green-bg: var(--hc-primary-soft);
+      --linear-green-border: var(--hc-primary-border-soft);
+      --linear-red: var(--hc-danger);
+      --linear-red-bg: rgba(239, 68, 68, 0.08);
+      --linear-red-border: rgba(239, 68, 68, 0.25);
+      --linear-amber: var(--hc-secondary);
+      --linear-amber-bg: var(--hc-secondary-soft);
+      --linear-amber-border: rgba(255, 191, 0, 0.35);
+      --linear-blue: var(--hc-blue);
+      --linear-blue-bg: var(--hc-blue-soft);
+      --accent: var(--hc-primary);
+      --accent-subtle: var(--hc-primary-soft);
+      --accent-glow: var(--hc-primary-border-soft);
+      --accent-blue: var(--hc-blue);
+      --accent-green: var(--hc-primary);
+      --accent-purple: #8B5CF6;
+      --accent-orange: var(--hc-secondary);
+      --primary: var(--hc-primary);
+      --primary-dark: var(--hc-primary-hover);
+      --radius-sm: 8px;
+      --radius-md: 10px;
+      --radius-lg: 12px;
+    }
+
+    [data-theme="dark"] {
+      --hc-primary: #44af7c;
+      --hc-primary-hover: #3b9a6d;
+      --hc-primary-text: #7bd3a8;
+      --hc-primary-soft: rgba(68, 175, 124, 0.16);
+      --hc-primary-pale: rgba(68, 175, 124, 0.08);
+      --hc-primary-border: rgba(68, 175, 124, 0.45);
+      --hc-primary-border-soft: rgba(68, 175, 124, 0.3);
+      --hc-primary-glow: rgba(68, 175, 124, 0.22);
+      --hc-secondary-soft: rgba(255, 191, 0, 0.14);
+      --hc-danger-soft: rgba(239, 68, 68, 0.14);
+      --hc-blue-soft: rgba(59, 130, 246, 0.14);
+      --hc-surface-page: #1e1e1e;
+      --hc-border: rgba(255, 255, 255, 0.12);
+      --hc-text-muted: #a1a1aa;
+      --hc-card: #2b2b2b;
+
+      --bg-app: #1e1e1e;
+      --bg-card: #2b2b2b;
+      --bg-card-hover: #343434;
+      --bg-input: #232323;
+      --bg-input-focus: #343434;
+      --bg-sidebar: rgba(68, 175, 124, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      --border: rgba(255, 255, 255, 0.12);
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --text-subtle: #71717a;
+      --linear-indigo: var(--hc-primary);
+      --linear-indigo-hover: var(--hc-primary-hover);
+      --linear-indigo-glow: var(--hc-primary-glow);
+      --linear-green: var(--hc-primary);
+      --linear-green-bg: var(--hc-primary-soft);
+      --linear-green-border: var(--hc-primary-border-soft);
+      --linear-amber: var(--hc-secondary);
+      --linear-amber-bg: var(--hc-secondary-soft);
+      --accent: var(--hc-primary);
+      --accent-subtle: var(--hc-primary-soft);
+      --accent-glow: var(--hc-primary-border-soft);
+      --primary: var(--hc-primary);
+      --primary-dark: var(--hc-primary-hover);
+    }
+
+    /* ── BASE ── */
+    body {
+      background: var(--bg-app) !important;
+      color: var(--text-main);
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    }
+    ::selection { background: var(--hc-primary-border-soft); }
+
+    /* ── TOP NAVBAR: putih solid, shadow lembut, gaya header Holycat ── */
+    .top-navbar,
+    [data-theme="light"] .top-navbar {
+      background: #ffffff !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-bottom: none !important;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.06) !important;
+      height: 64px;
+    }
+    [data-theme="dark"] .top-navbar {
+      background: #2b2b2b !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+    }
+    .nav-brand-tag {
+      background: var(--hc-primary-soft) !important;
+      color: var(--hc-primary-text) !important;
+      border: 1px solid var(--hc-primary-border-soft) !important;
+      border-radius: 9999px !important;
+      font-family: var(--hc-font-lilita) !important;
+      font-weight: 400 !important;
+      letter-spacing: 0.6px !important;
+    }
+    [data-theme="dark"] .nav-brand-tag { color: #7bd3a8 !important; }
+    .nav-user-info,
+    [data-theme="light"] .nav-user-info {
+      background: var(--hc-primary-pale) !important;
+      border: 1px solid var(--hc-primary-border-soft) !important;
+      color: var(--hc-primary-text) !important;
+      box-shadow: none !important;
+      border-radius: 9999px !important;
+      font-weight: 600 !important;
+    }
+    [data-theme="dark"] .nav-user-info {
+      background: rgba(68,175,124,0.12) !important;
+      border: 1px solid rgba(68,175,124,0.35) !important;
+      color: #7bd3a8 !important;
+    }
+
+    /* ── BUTTONS: rounded-lg khas Holycat (bukan pill), hijau primary ── */
+    .btn { border-radius: 10px !important; font-weight: 600; }
+    .btn-sm { border-radius: 8px !important; }
+    .btn-primary {
+      background: var(--hc-primary) !important;
+      border-color: var(--hc-primary) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px var(--hc-primary-glow) !important;
+    }
+    .btn-primary:hover {
+      background: var(--hc-primary-hover) !important;
+      border-color: var(--hc-primary-hover) !important;
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { background: var(--hc-primary-pressed) !important; }
+    .btn-success { background: var(--hc-primary) !important; color: #fff !important; }
+    .btn-success:hover { background: var(--hc-primary-hover) !important; }
+    .btn-secondary,
+    .btn-outline-light,
+    .btn-outline-secondary {
+      background: var(--bg-card) !important;
+      color: var(--text-main) !important;
+      border: 1px solid var(--border-card) !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .btn-secondary:hover,
+    .btn-outline-light:hover,
+    .btn-outline-secondary:hover {
+      background: var(--hc-primary-pale) !important;
+      border-color: var(--hc-primary-border) !important;
+      color: var(--hc-primary-text) !important;
+    }
+    [data-theme="dark"] .btn-secondary:hover,
+    [data-theme="dark"] .btn-outline-light:hover,
+    [data-theme="dark"] .btn-outline-secondary:hover {
+      background: rgba(68,175,124,0.12) !important;
+      color: #7bd3a8 !important;
+    }
+    .btn-danger { border-radius: 10px !important; }
+    .btn-ghost:hover { color: var(--hc-primary-text); background: var(--hc-primary-pale); }
+    [data-theme="dark"] .btn-ghost:hover { color: #7bd3a8; background: rgba(68,175,124,0.12); }
+
+    /* ── PAGE CONTAINER & KARTU: rounded-xl + border + shadow-sm ── */
+    .page-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 8px 30px rgba(0,0,0,0.04);
+    }
+    .section {
+      border: 1px solid var(--border-card) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 1px 2px var(--hc-shadow-soft);
+    }
+    .section-header {
+      background: var(--hc-primary-pale) !important;
+      border-bottom: 1px solid var(--hc-primary-border-soft) !important;
+    }
+    [data-theme="dark"] .section-header {
+      background: rgba(68,175,124,0.08) !important;
+      border-bottom: 1px solid rgba(68,175,124,0.2) !important;
+    }
+    .section-number {
+      background: var(--hc-primary) !important;
+      border: none !important;
+      color: #ffffff !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 6px var(--hc-primary-glow);
+    }
+    .section-title { color: var(--text-main) !important; }
+
+    /* ── DOC HEADER, CONTROL & BADGE ── */
+    .doc-control { border-radius: 14px; }
+    .doc-title { color: var(--text-main); }
+    .company-badge {
+      background: var(--hc-primary-pale);
+      border: 1px solid var(--hc-primary-border-soft);
+      color: var(--hc-primary-text);
+      border-radius: 9999px;
+    }
+    .company-logo-mark {
+      background: var(--hc-primary);
+      border-color: var(--hc-primary);
+      border-radius: 3px;
+    }
+    .header-main-logo { border: 1px solid var(--hc-border); border-radius: 10px; }
+
+    /* ── BANNERS ── */
+    .status-banner { border-radius: 12px; }
+    .status-banner--approved {
+      background: var(--hc-primary-soft);
+      color: var(--hc-primary-text);
+      border-color: var(--hc-primary-border-soft);
+    }
+    .status-banner--pending {
+      background: var(--hc-secondary-soft);
+      color: var(--hc-amber-deep);
+      border-color: var(--linear-amber-border);
+    }
+    [data-theme="dark"] .status-banner--pending { color: #ffd558; }
+    [data-theme="dark"] .status-banner--approved { color: #7bd3a8; }
+
+    /* ── FORM / INPUT: rounded-lg + green focus ring ── */
+    .form-control, .form-control-sm, .doc-control-value, .editable-area, .editable[contenteditable="true"], .home-search-input {
+      border-radius: 10px !important;
+      border-color: var(--border-card) !important;
+      background: var(--bg-input);
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .form-control:focus, .form-control-sm:focus,
+    .doc-control-value[contenteditable="true"]:focus,
+    .editable-area[contenteditable="true"]:focus,
+    .editable[contenteditable="true"]:focus,
+    .home-search-input:focus {
+      border-color: var(--hc-primary) !important;
+      box-shadow: 0 0 0 3px var(--hc-primary-glow) !important;
+      background: var(--bg-input-focus);
+    }
+    .doc-control-value[contenteditable="true"]:hover,
+    .editable-area[contenteditable="true"]:hover,
+    .editable[contenteditable="true"]:hover {
+      border-color: var(--hc-primary-border) !important;
+      background: var(--bg-card-hover);
+    }
+
+    /* ── TABEL DATA: header hijau pucat khas admin Holycat ── */
+    .data-table th {
+      background: var(--hc-primary-pale) !important;
+      color: var(--hc-primary-text) !important;
+      border-bottom: 2px solid var(--hc-primary-border-soft) !important;
+    }
+    [data-theme="dark"] .data-table th {
+      background: rgba(68,175,124,0.08) !important;
+      color: #7bd3a8 !important;
+      border-bottom: 2px solid rgba(68,175,124,0.25) !important;
+    }
+    .data-table tr:hover { background: var(--hc-primary-pale); }
+    [data-theme="dark"] .data-table tr:hover { background: rgba(68,175,124,0.06); }
+    .signoff-table th, .revision-table th {
+      background: var(--hc-primary-pale) !important;
+      color: var(--hc-primary-text) !important;
+    }
+    [data-theme="dark"] .signoff-table th,
+    [data-theme="dark"] .revision-table th {
+      background: rgba(68,175,124,0.08) !important;
+      color: #7bd3a8 !important;
+    }
+
+    /* ── STATUS & PRIORITY BADGES ── */
+    .status { border-radius: 9999px; }
+    .status--pass { background: var(--hc-primary-soft); color: var(--hc-primary-text); border-color: var(--hc-primary-border-soft); }
+    [data-theme="dark"] .status--pass { color: #7bd3a8; }
+    .status--pending { background: var(--hc-secondary-soft); color: var(--hc-amber-deep); border-color: var(--linear-amber-border); }
+    [data-theme="dark"] .status--pending { color: #ffd558; }
+    .priority { border-radius: 9999px; }
+    .priority--medium { background: var(--hc-secondary); color: #2b2b2b; }
+    .priority--low { background: var(--hc-blue); color: #fff; }
+
+    /* ── METRICS & PASS RATE ── */
+    .metric-card {
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border-card) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 1px 2px var(--hc-shadow-soft);
+    }
+    .metric-card--total { border-left: 4px solid var(--hc-blue) !important; }
+    .metric-card--pass { border-left: 4px solid var(--hc-primary) !important; }
+    .metric-card--fail { border-left: 4px solid var(--hc-danger) !important; }
+    .metric-card--skip { border-left: 4px solid var(--hc-secondary) !important; }
+    .metric-card--skip .metric-value { color: var(--hc-amber-deep); }
+    [data-theme="dark"] .metric-card--skip .metric-value { color: var(--hc-secondary); }
+    .metric-card--pass .metric-value { color: var(--hc-primary-text); }
+    [data-theme="dark"] .metric-card--pass .metric-value { color: #7bd3a8; }
+    .pass-rate-container { border-radius: 14px; }
+    .pass-rate-value { color: var(--hc-primary-text) !important; }
+    [data-theme="dark"] .pass-rate-value { color: #7bd3a8 !important; }
+    .pass-rate-bar { background: var(--hc-primary-soft); border-radius: 9999px; height: 8px; }
+    .pass-rate-fill { background: linear-gradient(90deg, var(--hc-primary), #369f6e); border-radius: 9999px; }
+
+    /* ── UPLOAD & EVIDENCE ── */
+    .flowchart-area { border-radius: 12px; border-color: var(--hc-primary-border-soft); }
+    .flowchart-area:hover { border-color: var(--hc-primary); background: var(--hc-primary-pale); }
+    .evidence-card { border-radius: 12px; }
+    .evidence-id { color: var(--hc-primary-text); }
+    [data-theme="dark"] .evidence-id { color: #7bd3a8; }
+
+    /* ── DECISION CARDS ── */
+    .decision-card { border-radius: 14px; }
+    .decision-card--go:has(input:checked) {
+      border-color: var(--hc-primary);
+      background: var(--hc-primary-soft);
+      box-shadow: 0 4px 14px var(--hc-primary-glow);
+    }
+    .decision-card--go .decision-label { color: var(--hc-primary-text); }
+    [data-theme="dark"] .decision-card--go .decision-label { color: #7bd3a8; }
+
+    /* ── MODAL & LOGIN: kartu rounded-2xl dgn header hijau soft (gaya login admin Holycat) ── */
+    .modal-overlay {
+      background: rgba(43, 43, 43, 0.6);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .modal-card {
+      border-radius: 20px !important;
+      border: 1px solid var(--border-card) !important;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;
+      overflow: hidden;
+    }
+    .modal-header {
+      background: var(--hc-primary-pale) !important;
+      color: var(--hc-primary-text) !important;
+      border-bottom: 1px solid var(--hc-primary-border-soft) !important;
+      font-family: var(--hc-font-lilita);
+      font-weight: 400 !important;
+      font-size: 15px !important;
+      letter-spacing: 0.5px;
+    }
+    [data-theme="dark"] .modal-header {
+      background: rgba(68,175,124,0.1) !important;
+      color: #7bd3a8 !important;
+      border-bottom: 1px solid rgba(68,175,124,0.25) !important;
+    }
+    .login-error-msg { border-radius: 10px; }
+    .quick-login-grid .btn { border-radius: 10px !important; }
+    .signature-pad-container { border-radius: 12px; border-color: var(--hc-primary-border-soft); }
+
+    /* ── POPOVERS ── */
+    .history-popover, .share-popover {
+      border-radius: 14px;
+      border: 1px solid var(--border-card);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+    }
+    .history-popover .popover-header,
+    .share-popover .popover-header,
+    .history-popover .popover-footer {
+      background: var(--hc-primary-pale);
+      color: var(--hc-primary-text);
+      border-color: var(--hc-primary-border-soft);
+    }
+    [data-theme="dark"] .history-popover .popover-header,
+    [data-theme="dark"] .share-popover .popover-header,
+    [data-theme="dark"] .history-popover .popover-footer {
+      background: rgba(68,175,124,0.08);
+      color: #7bd3a8;
+    }
+    .history-popover .popover-item .doc-num { color: var(--hc-primary-text); }
+    [data-theme="dark"] .history-popover .popover-item .doc-num { color: #7bd3a8; }
+    .history-popover .popover-footer:hover { background: var(--hc-primary-soft); color: var(--hc-primary-hover); }
+    .share-popover #btn-copy-link {
+      background: var(--hc-primary) !important;
+      border-radius: 8px;
+    }
+    .share-popover #btn-copy-link:hover { background: var(--hc-primary-hover) !important; }
+
+    /* ── HOME HERO: dekorasi blur hijau & amber persis halaman login Holycat ── */
+    .home-hero,
+    [data-theme="light"] .home-hero,
+    [data-theme="light"] .hero-section {
+      position: relative;
+      background: var(--hc-surface-bluegray) !important;
+      border: 1px solid var(--hc-border) !important;
+      border-radius: 24px !important;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06) !important;
+    }
+    [data-theme="dark"] .home-hero {
+      background: #232323 !important;
+      border: 1px solid rgba(255,255,255,0.08) !important;
+    }
+    .home-hero::before,
+    .home-hero::after {
+      content: "";
+      position: absolute;
+      width: 380px; height: 380px;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .home-hero::before { top: -35%; right: -12%; background: var(--hc-primary); }
+    .home-hero::after { bottom: -40%; left: -12%; background: var(--hc-secondary); opacity: 0.28; }
+    .home-hero > * { position: relative; z-index: 1; }
+    .home-hero h1,
+    [data-theme="light"] .hero-title {
+      font-family: var(--hc-font-lilita) !important;
+      font-weight: 400 !important;
+      letter-spacing: 0.5px !important;
+      color: var(--hc-dark) !important;
+    }
+    [data-theme="dark"] .home-hero h1 { color: #ffffff !important; }
+    .home-hero p { color: var(--hc-gray-700); }
+    [data-theme="dark"] .home-hero p { color: #a1a1aa; }
+
+    /* Hero buttons — hijau Holycat, bukan indigo */
+    .btn-hero-primary,
+    [data-theme="light"] .btn-hero-primary {
+      background: var(--hc-primary) !important;
+      border: 1px solid var(--hc-primary) !important;
+      color: #ffffff !important;
+      border-radius: 12px !important;
+      box-shadow: 0 4px 14px rgba(68, 175, 124, 0.35) !important;
+    }
+    .btn-hero-primary:hover,
+    [data-theme="light"] .btn-hero-primary:hover {
+      background: var(--hc-primary-hover) !important;
+      border-color: var(--hc-primary-hover) !important;
+      box-shadow: 0 6px 20px rgba(68, 175, 124, 0.45) !important;
+      transform: translateY(-2px);
+    }
+    .btn-hero-secondary,
+    [data-theme="light"] .btn-hero-secondary {
+      background: #ffffff !important;
+      color: var(--hc-dark) !important;
+      border: 2px solid var(--hc-primary-border) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    }
+    .btn-hero-secondary:hover,
+    [data-theme="light"] .btn-hero-secondary:hover {
+      background: var(--hc-primary-pale) !important;
+      color: var(--hc-primary-text) !important;
+      border-color: var(--hc-primary) !important;
+    }
+    [data-theme="dark"] .btn-hero-secondary {
+      background: #2b2b2b !important;
+      color: #ffffff !important;
+      border: 2px solid rgba(68,175,124,0.45) !important;
+    }
+    [data-theme="dark"] .btn-hero-secondary:hover {
+      background: rgba(68,175,124,0.12) !important;
+      color: #7bd3a8 !important;
+    }
+
+    /* ── STAT CARDS DASHBOARD ── */
+    .stat-card,
+    [data-theme="light"] .stat-card {
+      border-radius: 16px !important;
+      border: 1px solid var(--hc-border) !important;
+      box-shadow: 0 1px 2px var(--hc-shadow-soft) !important;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--hc-primary-border) !important;
+      box-shadow: 0 8px 24px rgba(68, 175, 124, 0.12) !important;
+    }
+    .stat-icon { border-radius: 14px; }
+    .stat-icon.total { background: var(--hc-blue-soft); color: var(--hc-blue); }
+    .stat-icon.approved { background: var(--hc-primary-soft); color: var(--hc-primary); }
+    .stat-icon.pending { background: var(--hc-secondary-soft); color: var(--hc-amber-deep); }
+    .stat-icon.rejected { background: var(--hc-danger-soft); color: var(--hc-danger); }
+    [data-theme="dark"] .stat-icon.pending { color: var(--hc-secondary); }
+
+    /* ── TABEL & KARTU DOKUMEN DI HOME ── */
+    .home-table-container { border-radius: 18px; border: 1px solid var(--hc-border); }
+    [data-theme="light"] .home-section-title { color: var(--hc-dark) !important; }
+    .doc-card,
+    [data-theme="light"] .doc-card {
+      border-radius: 16px !important;
+      border: 1px solid var(--hc-border) !important;
+      box-shadow: 0 1px 2px var(--hc-shadow-soft) !important;
+    }
+    .doc-card:hover,
+    [data-theme="light"] .doc-card:hover {
+      border-color: var(--hc-primary) !important;
+      box-shadow: 0 10px 25px -5px rgba(68, 175, 124, 0.2) !important;
+      transform: translateY(-2px);
+    }
+    .doc-card-id,
+    [data-theme="light"] .doc-card-id {
+      color: var(--hc-primary-text) !important;
+      background: var(--hc-primary-soft) !important;
+      border: 1px solid var(--hc-primary-border-soft) !important;
+      border-radius: 8px;
+    }
+    [data-theme="dark"] .doc-card-id { color: #7bd3a8 !important; }
+    [data-theme="light"] .doc-card-title { color: var(--hc-dark) !important; }
+
+    /* ── SIGNATURE BADGE ── */
+    .signoff-img-container img,
+    .signature-img,
+    .signoff-cell img {
+      border: 1px solid var(--hc-primary-border-soft) !important;
+      border-radius: 10px !important;
+    }
+    .btn-sig-trigger { border-radius: 8px !important; }
+
+    /* ── INLINE LABEL & UTIL ── */
+    .inline-label { color: var(--hc-primary-text) !important; }
+    [data-theme="dark"] .inline-label { color: #7bd3a8 !important; }
+    .divider { background: var(--border-subtle); }
+
+    /* ── SCROLLBAR HALUS ── */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--hc-primary-border-soft); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--hc-primary-border); }
+
+    /* ── PRINT: pertahankan identitas cetak profesional (hijau tua terbaca) ── */
+    @media print {
+      :root, [data-theme="light"], [data-theme="dark"], body {
+        --linear-indigo: #2b7a52 !important;
+        --linear-green: #166534 !important;
+      }
+      .section { border-radius: 8px !important; }
+      .section-number { background: #e8f5ef !important; color: #2b7a52 !important; }
+      .section-header { background: #f4fbf7 !important; }
+      .data-table th { background: #f4fbf7 !important; color: #2b7a52 !important; }
+    }
+
+    /* ── HOLYCAT LOGIN REDESIGN (standar LoginView.js e-commerce) ── */
+    #login-modal { overflow: visible; }
+    #login-modal .modal-card {
+      position: relative;
+      z-index: 1; /* di atas blob dekorasi; jika dot-canvas dipasang nanti, beri canvas z-index 0 & pointer-events:none */
+    }
+    .login-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      -webkit-filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .login-blob.blob-green {
+      width: 460px; height: 460px;
+      background: rgba(68, 175, 124, 0.45);
+      top: -140px; left: -140px;
+    }
+    .login-blob.blob-amber {
+      width: 400px; height: 400px;
+      background: rgba(255, 191, 0, 0.35);
+      bottom: -130px; right: -110px;
+    }
+    [data-theme="dark"] .login-blob.blob-green { background: rgba(68, 175, 124, 0.28); }
+    [data-theme="dark"] .login-blob.blob-amber { background: rgba(255, 191, 0, 0.18); }
+
+    .login-logo {
+      height: 80px;
+      margin-bottom: 20px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 14px rgba(43, 43, 43, 0.14));
+    }
+    [data-theme="dark"] .login-logo { filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5)); }
+
+    .login-title {
+      font-family: var(--hc-font-lilita);
+      font-weight: 400;
+      font-size: 30px;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .input-icon-wrap { position: relative; }
+    .input-icon-wrap svg {
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+    /* !important diperlukan: menimpa rule global compact ".form-control { padding: 5px 8px !important }" */
+    #login-modal .input-icon-wrap .form-control {
+      padding: 11px 16px 11px 44px !important;
+      font-size: 13px !important;
+      border-radius: 10px !important;
+    }
+    #login-modal .form-control:focus {
+      border-color: var(--hc-primary);
+      box-shadow: 0 0 0 3px var(--hc-primary-glow);
+    }
+    #login-modal .form-control:focus + svg,
+    .input-icon-wrap:focus-within svg { color: var(--hc-primary); }
+
+    /* ── AUTO DOCUMENT NUMBER (non-editable, generated from Kode Sistem) ── */
+    .doc-control-value--locked {
+      cursor: not-allowed;
+      user-select: none;
+      background: var(--bg-input, rgba(0,0,0,0.03));
+      color: var(--text-muted);
+      opacity: 0.9;
+      pointer-events: none; /* mencegah klik/fokus/ketik langsung */
+    }
+    .doc-control-auto-tag {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--hc-primary-text, var(--accent-green));
+      background: var(--hc-primary-soft, rgba(68,175,124,0.12));
+      border: 1px solid var(--hc-primary-border-soft, rgba(68,175,124,0.3));
+      border-radius: 999px;
+      padding: 1px 7px;
+      margin-left: 6px;
+      letter-spacing: 0.2px;
+      vertical-align: middle;
+    }
+    /* Tombol hapus dokumen (danger outline) */
+    .btn-danger-outline {
+      background: transparent;
+      border: 1px solid var(--linear-red, #e5484d);
+      color: var(--linear-red, #e5484d);
+    }
+    .btn-danger-outline:hover { background: rgba(229,72,77,0.1); }
+    /* ── HOLYCAT WATERMARK (logo semi-transparan) ── */
+    .doc-watermark {
+      position: fixed;
+      inset: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 45%;
+      opacity: 0.05;
+      pointer-events: none; /* tidak mengganggu input / contenteditable / klik */
+      z-index: 2; /* di atas card (bg opaque) agar terlihat, di bawah navbar (1000) & modal (10000) */
+    }
+    [data-theme="dark"] .doc-watermark { opacity: 0.07; }
+    @media (max-width: 640px) {
+      .doc-watermark { background-size: 80%; } /* tetap proporsional di layar kecil, tidak overflow */
+    }
+    @media print {
+      .doc-watermark {
+        display: block !important;
+        position: fixed !important; /* fixed = terulang di setiap halaman cetak */
+        opacity: 0.08 !important;
+        background-size: 55%;
+        z-index: 9999 !important; /* di atas section berlatar putih agar tetap tercetak */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+    /* ── HOLYCAT DOT CURSOR EFFECT (login & dashboard) ── */
+    #dot-canvas-app {
+      position: fixed;
+      inset: 0;
+      width: 100%;           /* WAJIB: canvas = replaced element, inset:0 saja tidak membuatnya melar */
+      height: 100%;
+      display: block;
+      z-index: 0;            /* di belakang konten (home-view diberi z-index 1), di bawah watermark (2) */
+      pointer-events: none;  /* tidak menghalangi klik/scroll */
+      transform: translateZ(0); /* paksa layer GPU sendiri agar fixed-position tidak jank saat momentum-scroll di Safari iOS */
+      will-change: transform;
+    }
+    #home-view, #form-view { position: relative; z-index: 1; }
+    #login-modal .login-dot-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;           /* WAJIB: canvas = replaced element, inset:0 saja tidak membuatnya melar */
+      height: 100%;
+      display: block;
+      z-index: 0;            /* sejajar blob (DOM order: dipasang setelah blob → dots di atas blob), card tetap z-index 1 */
+      pointer-events: none;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════ */

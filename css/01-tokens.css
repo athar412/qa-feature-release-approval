@@ -1,0 +1,94 @@
+/* ================================================= */
+    /*  HOLYCAT MODERN CORPORATE UI SYSTEM               */
+    /* ================================================= */
+
+    :root, [data-theme="light"] {
+      --bg-app: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --bg-input: #f8fafc;
+      --bg-input-focus: #ffffff;
+      --border-subtle: rgba(0, 0, 0, 0.05);
+      --border-card: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.12);
+      
+      --text-main: #2b2b2b;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      
+      /* Posyancing Primary Green */
+      --linear-indigo: #44af7c;
+      --linear-indigo-hover: #369b6a;
+      --linear-indigo-glow: rgba(68, 175, 124, 0.15);
+      
+      --linear-green: #44af7c;
+      --linear-green-bg: #e6f6ef;
+      --linear-green-border: rgba(68, 175, 124, 0.3);
+      
+      --linear-red: #ef4444;
+      --linear-red-bg: rgba(239, 68, 68, 0.1);
+      --linear-red-border: rgba(239, 68, 68, 0.25);
+      
+      --linear-amber: #ffbf00;
+      --linear-amber-bg: rgba(255, 191, 0, 0.15);
+      --linear-amber-border: rgba(255, 191, 0, 0.3);
+      
+      --linear-blue: #3B82F6;
+      --linear-blue-bg: rgba(59, 130, 246, 0.1);
+      
+      /* Dashboard Accent Borders */
+      --accent-blue: #3B82F6;
+      --accent-green: #44af7c;
+      --accent-purple: #8B5CF6;
+      --accent-orange: #ffbf00;
+
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg-app: #1e1e1e;
+      --bg-card: #2b2b2b;
+      --bg-card-hover: #3a3a3a;
+      --bg-input: #1e1e1e;
+      --bg-input-focus: #3a3a3a;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-card: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.2);
+      
+      --text-main: #ffffff;
+      --text-muted: #a1a1aa;
+      --text-subtle: #71717a;
+      
+      /* Posyancing Primary Green in dark mode */
+      --linear-indigo: #44af7c;
+      --linear-indigo-hover: #369b6a;
+      --linear-indigo-glow: rgba(68, 175, 124, 0.22);
+      
+      --linear-green: #44af7c;
+      --linear-green-bg: #2c4a3e;
+      --linear-green-border: rgba(68, 175, 124, 0.3);
+      
+      --linear-red: #ef4444;
+      --linear-red-bg: rgba(239, 68, 68, 0.15);
+      --linear-red-border: rgba(239, 68, 68, 0.3);
+      
+      --linear-amber: #ffbf00;
+      --linear-amber-bg: rgba(255, 191, 0, 0.15);
+      --linear-amber-border: rgba(255, 191, 0, 0.3);
+      
+      --linear-blue: #3B82F6;
+      --linear-blue-bg: rgba(59, 130, 246, 0.15);
+      
+      /* Dashboard Accent Borders */
+      --accent-blue: #3B82F6;
+      --accent-green: #44af7c;
+      --accent-purple: #8B5CF6;
+      --accent-orange: #ffbf00;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
