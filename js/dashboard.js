@@ -63,7 +63,7 @@ export function filterHomeDocsList() {
               <div class="doc-card-title">${d.docName || 'Formulir Persetujuan Rilis'}</div>
               <div class="doc-card-meta">
                 <span>📅 ${d.date || 'Terbaru'}</span>
-                <span>🔢 Ver: ${d.releaseVersion || '1.0'}</span>
+                <span>📦 Ver: ${d.releaseVersion || '1.0'}</span>
               </div>
             </div>
             <div class="doc-card-actions">
