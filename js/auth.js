@@ -134,9 +134,10 @@ export function applyAuthUI() {
       }
 
       // STRICT VIEW CONTROL FOR NAVBAR ACTION BUTTONS
-      const homeViewEl = document.getElementById('home-view');
-      const isHomeActive = homeViewEl && homeViewEl.style.display !== 'none';
-      if (isHomeActive) {
+      // Gunakan form-view sebagai indikator: jika form-view visible = sedang di form dokumen
+      const formViewEl = document.getElementById('form-view');
+      const isFormActive = formViewEl && formViewEl.style.display !== 'none';
+      if (!isFormActive) {
         setElementStyle('btn-save-doc', 'display', 'none');
         const printBtn = document.getElementById('btn-print-doc');
         if (printBtn) printBtn.style.setProperty('display', 'none', 'important');
