@@ -103,7 +103,7 @@ export function getFormState() {
         docDate: docDate,
         html: container.innerHTML,
         status: state.docStatus,
-        state.rejectionReason: state.rejectionReason,
+        rejectionReason: state.rejectionReason,
         signoffs: signoffs,
         updatedAt: new Date().toISOString(),
         updatedBy: state.currentUser ? state.currentUser.username : 'guest'
