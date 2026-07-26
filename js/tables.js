@@ -91,16 +91,24 @@ export function addEvidenceCard() {
       const card = document.createElement('div');
       card.className = 'evidence-card';
       card.innerHTML = `
+        <div style="position:absolute; top:6px; right:6px; z-index:15;" class="no-print">
+          <button type="button" class="btn btn-ghost btn-sm text-danger" style="padding:2px 6px; font-size:12px; background:rgba(0,0,0,0.5); border-radius:4px;" onclick="deleteEvidenceCard(this)" title="Hapus Kartu">🗑️</button>
+        </div>
         <div class="evidence-img-area">
           <span class="upload-text">Upload Screenshot</span>
           <input type="file" accept="image/*" onchange="previewEvidence(event, this)" />
         </div>
         <div class="evidence-meta">
           <div class="evidence-id" contenteditable="true" data-placeholder="TC-${String(cardCount).padStart(3,'0')}">TC-${String(cardCount).padStart(3,'0')}</div>
-          <div class="evidence-desc" contenteditable="true" data-placeholder="Keterangan screenshot...">Keterangan screenshot...</div>
+          <div class="evidence-desc" contenteditable="true" data-placeholder="Deskripsi bukti screenshot..."></div>
         </div>
       `;
       grid.appendChild(card);
+    }
+
+export function deleteEvidenceCard(btn) {
+      const card = btn.closest('.evidence-card');
+      if (card) card.remove();
     }
 
 export function addTestCaseRow() {

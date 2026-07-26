@@ -48,10 +48,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      overflow-x: auto;      /* Jika tombol terlalu banyak untuk 1 baris, geser horizontal (bukan pecah 2 baris) */
-      overflow-y: hidden;
-      scrollbar-width: none; /* Sembunyikan scrollbar (Firefox) agar tetap rapi secara visual */
-      -ms-overflow-style: none;
+      overflow: visible;     /* Pastikan popover Share dan History yang menggantung ke bawah tidak terpotong */
       max-width: 68vw;       /* Sisakan ruang untuk logo & info pengguna di kiri */
     }
     .nav-actions::-webkit-scrollbar { display: none; } /* Sembunyikan scrollbar (Chrome/Safari) */

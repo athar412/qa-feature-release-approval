@@ -2,7 +2,7 @@ import { state } from './state.js';
 import { setElementStyle } from './dom-utils.js';
 import { updateMetricsFromRtm, updateStatusBanners } from './metrics.js';
 import { openSignatureModal } from './signature.js';
-import { applyAuthUI } from './auth.js';
+import { applyAuthUI, setGeneralEditable, setKnownIssuesEditable, setAddButtonsVisible } from './auth.js';
 import { fetchAllDocumentsForHome } from './dashboard.js';
 import { showHomeView } from './navigation.js';
 
@@ -461,3 +461,13 @@ export async function deleteDocumentAction(docId) {
         fetchAllDocumentsForHome();
       }
     }
+
+export function lockDocumentUI() {
+  setGeneralEditable(false);
+  setKnownIssuesEditable(false);
+  setAddButtonsVisible(false);
+  setElementStyle('btn-sig-qa-lead', 'display', 'none');
+  setElementStyle('btn-sig-tech-lead', 'display', 'none');
+  setElementStyle('btn-sig-product-owner', 'display', 'none');
+  setElementStyle('approver-action-box', 'display', 'none');
+}

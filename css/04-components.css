@@ -432,25 +432,68 @@
       border: 1px solid var(--border-card);
       border-radius: var(--radius-sm);
       overflow: hidden;
-      background: var(--bg-input);
+      background: var(--bg-card);
+      position: relative;
+      display: flex;
+      flex-direction: column;
     }
     .evidence-img-area {
-      height: 120px;
-      background: var(--bg-card-hover);
+      min-height: 140px;
+      max-height: 220px;
+      height: auto;
+      background: #0f172a;
       border-bottom: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       position: relative;
+      overflow: hidden;
     }
-    .evidence-img-area img { width: 100%; height: 100%; object-fit: cover; }
+    .evidence-img-area img {
+      width: 100%;
+      height: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
     .evidence-img-area input[type="file"] {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;
     }
-    .evidence-meta { padding: 8px 10px; }
-    .evidence-id { font-size: 10px; font-weight: 700; color: var(--linear-indigo); margin-bottom: 2px; }
-    .evidence-desc { font-size: 11px; color: var(--text-muted); }
+    .evidence-meta {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      z-index: 10;
+      background: var(--bg-card);
+    }
+    .evidence-id {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--linear-indigo);
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 8px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+    .evidence-desc {
+      font-size: 11px;
+      color: var(--text-main);
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 10px;
+      border-radius: 6px;
+      min-height: 48px;
+      line-height: 1.4;
+    }
+    .evidence-desc:focus, .evidence-id:focus {
+      outline: none;
+      border-color: var(--linear-indigo);
+    }
 
     /* --- DECISION GRID --- */
     .decision-grid {

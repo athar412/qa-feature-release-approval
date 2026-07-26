@@ -2,6 +2,7 @@ import { state } from './state.js';
 import { setElementStyle } from './dom-utils.js';
 import { updateStatusBanners } from './metrics.js';
 import { showHomeView } from './navigation.js';
+import { lockDocumentUI } from './document-store.js';
 
 export function processLogin() {
       const usernameInput = (document.getElementById('login-username')?.value || '').trim().toLowerCase();

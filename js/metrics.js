@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { setElementStyle } from './dom-utils.js';
+import { lockDocumentUI } from './document-store.js';
 
 export function calculatePassRate() {
       const rtmTable = document.getElementById('rtm-table').getElementsByTagName('tbody')[0];

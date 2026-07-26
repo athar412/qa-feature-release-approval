@@ -36,7 +36,7 @@ export function previewEvidence(event, inputEl) {
           let img = imgArea.querySelector('img');
           if (!img) {
             img = document.createElement('img');
-            img.style.cssText = 'width:100%; height:auto; max-height:180px; object-fit:cover; display:block;';
+            img.style.cssText = 'width:100%; height:auto; max-height:220px; object-fit:contain; display:block; margin:0 auto;';
             imgArea.insertBefore(img, imgArea.firstChild);
           }
           img.src = e.target.result;

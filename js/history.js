@@ -130,3 +130,13 @@ export async function renderHistoryTable() {
         });
       }
     }
+
+export function showHistoryPopover() {
+  const popover = document.getElementById('history-popover');
+  if (popover) popover.style.display = 'flex';
+}
+
+export function hideHistoryPopover() {
+  const popover = document.getElementById('history-popover');
+  if (popover) popover.style.display = 'none';
+}

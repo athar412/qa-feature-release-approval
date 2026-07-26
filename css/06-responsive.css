@@ -164,7 +164,7 @@
       .pass-rate-container { padding: 14px !important; }
       .flowchart-area { padding: 16px 12px !important; }
       .evidence-grid { grid-template-columns: 1fr !important; }
-      .evidence-img-area { height: 150px !important; }
+      .evidence-img-area { min-height: 140px !important; max-height: 200px !important; height: auto !important; }
 
       /* ── KEPUTUSAN & TANDA TANGAN ── */
       .decision-grid { grid-template-columns: 1fr !important; }
