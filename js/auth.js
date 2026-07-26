@@ -142,6 +142,12 @@ export function applyAuthUI() {
         if (printBtn) printBtn.style.setProperty('display', 'none', 'important');
         const shareWrap = document.querySelector('.share-popover-wrapper');
         if (shareWrap) shareWrap.style.display = 'none';
+      } else {
+        setElementStyle('btn-save-doc', 'display', 'inline-flex');
+        const printBtn = document.getElementById('btn-print-doc');
+        if (printBtn) printBtn.style.setProperty('display', 'inline-flex', 'important');
+        const shareWrap = document.querySelector('.share-popover-wrapper');
+        if (shareWrap) shareWrap.style.display = 'inline-block';
       }
 
       if (state.docStatus === 'APPROVED' || state.docStatus === 'REJECTED') {

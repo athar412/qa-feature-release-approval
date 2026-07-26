@@ -193,10 +193,10 @@ export async function saveDocumentToCloud(formState) {
 
       // Fallback to legacy KVDB (cadangan darurat, bukan sumber kebenaran utama)
       try {
-        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(formState.id)}`, {
+        const response = await fetch(`${state.CLOUD_API_BASE}/${encodeURIComponent(formState.id)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(state)
+          body: JSON.stringify(formState)
         });
         console.log('Legacy Cloud DB Save Status:', response.status);
         if (response.ok) {
@@ -245,7 +245,7 @@ export async function loadDocumentFromCloud(docId) {
 
       // Fallback to legacy KVDB
       try {
-        const response = await fetch(`${CLOUD_API_BASE}/${encodeURIComponent(docId)}`);
+        const response = await fetch(`${state.CLOUD_API_BASE}/${encodeURIComponent(docId)}`);
         if (response.ok) {
           const cloudData = await response.json();
           if (cloudData && cloudData.id) {
