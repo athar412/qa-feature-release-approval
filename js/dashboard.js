@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { copyShareUrlDirect } from './share.js';
 import { deleteDocumentAction } from './document-store.js';
+import { showFormView } from './navigation.js';
 
 export function renderHomeDashboard() {
       // Calculate Stats
@@ -79,4 +80,45 @@ export function filterHomeDocsList() {
           </div>
         `;
       }).join('');
+    }
+
+export async function fetchAllDocumentsForHome() {
+      state.allHomeDocs = [];
+      
+      if (state.supabaseClient) {
+        try {
+          const { data, error } = await state.supabaseClient
+            .from('qa_documents')
+            .select('*')
+            .order('updated_at', { ascending: false });
+
+          if (!error && data && data.length > 0) {
+            data.forEach(item => {
+              if (item.document_data) {
+                const docObj = {
+                  ...item.document_data,
+                  id: item.id || item.document_data.id,
+                  status: item.status || item.document_data.status || 'PENDING',
+                  docName: item.document_data.docName || item.doc_title || 'Formulir Persetujuan Rilis',
+                  date: item.document_data.date || item.document_data.docDate || (item.updated_at ? new Date(item.updated_at).toLocaleDateString('id-ID') : 'Terbaru')
+                };
+                const idx = state.allHomeDocs.findIndex(x => x.id === docObj.id);
+                if (idx !== -1) {
+                  state.allHomeDocs[idx] = docObj;
+                } else {
+                  state.allHomeDocs.push(docObj);
+                }
+              }
+            });
+          }
+        } catch(err) {
+          console.warn("Supabase fetch all for home error:", err);
+        }
+      }
+
+      renderHomeDashboard();
+    }
+
+export function openDocumentFromHome(docId) {
+      showFormView(docId);
     }

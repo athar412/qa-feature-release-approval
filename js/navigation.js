@@ -3,6 +3,7 @@ import { setElementStyle } from './dom-utils.js';
 import { updateMetricsFromRtm } from './metrics.js';
 import { applyAuthUI } from './auth.js';
 import { updateAutoDocNumber, loadDocumentFromCloud } from './document-store.js';
+import { fetchAllDocumentsForHome } from './dashboard.js';
 
 export function toggleMobileMenu() {
       const actions = document.querySelector('.nav-actions');
@@ -114,4 +115,9 @@ export function createNewDocument() {
         // tangan / approve, yang semuanya sudah otomatis memicu simpan) —
         // di titik itu Kode Sistem yang dipilih user sudah pasti benar.
       });
+    }
+
+export function scrollToDocumentsList() {
+      const elem = document.getElementById('documents-board-section');
+      if (elem) elem.scrollIntoView({ behavior: 'smooth' });
     }

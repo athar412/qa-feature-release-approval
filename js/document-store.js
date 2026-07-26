@@ -3,6 +3,7 @@ import { setElementStyle } from './dom-utils.js';
 import { updateMetricsFromRtm, updateStatusBanners } from './metrics.js';
 import { openSignatureModal } from './signature.js';
 import { applyAuthUI } from './auth.js';
+import { fetchAllDocumentsForHome } from './dashboard.js';
 import { showHomeView } from './navigation.js';
 
 export async function updateAutoDocNumber() {
