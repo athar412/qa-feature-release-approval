@@ -156,10 +156,14 @@ export async function saveDocument(silent = false) {
 export async function saveDocumentToCloud(formState) {
       if (!formState || !formState.id) return { success: false, reason: 'Data dokumen tidak valid.' };
       
-      // Save locally first
-      let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      docs[formState.id] = formState;
-      localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+      // Save locally first (dengan proteksi quota exceed agar tidak memblokir simpan ke Supabase cloud)
+      try {
+        let docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+        docs[formState.id] = formState;
+        localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+      } catch (e) {
+        console.warn('⚠️ Peringatan: Penyimpanan lokal browser penuh (QuotaExceeded). Tetap melompat ke proses simpan Supabase Cloud.', e);
+      }
 
       let supabaseErrorMsg = null;
 

@@ -1,6 +1,6 @@
 import { state } from './state.js';
 
-function compressImage(file, maxDimension = 1080, quality = 0.75) {
+function compressImage(file, maxDimension = 900, quality = 0.65) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = function(e) {

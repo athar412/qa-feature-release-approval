@@ -153,9 +153,31 @@
       .flowchart-area .upload-hint,
       .evidence-img-area .upload-text { display: none !important; }
 
-      /* Gambar bukti pengujian juga dijaga agar tidak memicu dorongan halaman */
-      .evidence-card { break-inside: avoid !important; page-break-inside: avoid !important; }
-      .evidence-card img { max-height: 90mm !important; object-fit: contain !important; }
+      /* ── BUKTI PENGUJIAN (EVIDENCE): PRINT 4 KOLOM HORIZONTAL ──
+         Mengabaikan aturan 1 kolom dari mobile query agar bukti pengujian
+         ditampilkan 4 kolom sejajar per baris horizontal di halaman PDF. */
+      .evidence-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 6mm !important;
+      }
+      .evidence-card {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+      }
+      .evidence-card img {
+        max-height: 40mm !important;
+        width: 100% !important;
+        object-fit: contain !important;
+      }
+      .evidence-img-area {
+        height: auto !important;
+        min-height: 0 !important;
+      }
+      .evidence-id, .evidence-desc {
+        font-size: 8px !important;
+      }
+
       /* ── D. KEPUTUSAN RILIS: HANYA CETAK YANG DIPILIH ──
          Di layar kedua kartu ditampilkan agar bisa dipilih. Di PDF, mencetak
          opsi yang TIDAK dipilih justru membingungkan pembaca dokumen resmi —
