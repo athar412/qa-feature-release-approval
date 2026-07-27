@@ -498,11 +498,15 @@ export function lockDocumentUI() {
   if (formView) {
     formView.querySelectorAll('input, select, textarea').forEach(el => {
       el.disabled = true;
+      el.style.pointerEvents = 'none';
     });
     formView.querySelectorAll('.editable, [contenteditable="true"]').forEach(el => {
       el.setAttribute('contenteditable', 'false');
     });
-    formView.querySelectorAll('.btn-remove-row, .btn-sig-trigger, .btn-add-row').forEach(el => {
+    formView.querySelectorAll(
+      'button[onclick*="add"], button[onclick*="delete"], button[onclick*="import"], ' +
+      '.add-evidence-btn, .btn-add-row, .btn-remove-row, .btn-sig-trigger, input[type="file"]'
+    ).forEach(el => {
       el.style.display = 'none';
     });
   }
@@ -543,37 +547,31 @@ export async function unlockDocumentUIBySuperAdmin() {
     alert("⛔ Akses Ditolak: Hanya Super Admin yang berwenang membuka kunci dokumen ini!");
     return;
   }
-  if (!confirm("⚠️ APAKAH ANDA YAKIN ingin membuka kunci dokumen [APPROVED] ini menjadi [PENDING]? Seluruh input akan kembali dapat diedit.")) {
+  if (!confirm("⚠️ APAKAH ANDA YAKIN ingin membuka kunci dokumen [APPROVED/REJECTED] ini menjadi [PENDING]? Seluruh input akan kembali dapat diedit.")) {
     return;
   }
 
   state.docStatus = 'PENDING';
-  setGeneralEditable(true);
-  setKnownIssuesEditable(true);
-  setAddButtonsVisible(true);
-  setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
-  setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
-  setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
-  setElementStyle('approver-action-box', 'display', 'block');
 
   const formView = document.getElementById('form-view');
   if (formView) {
     formView.querySelectorAll('input, select, textarea').forEach(el => {
       el.disabled = false;
+      el.style.pointerEvents = 'auto';
     });
     formView.querySelectorAll('.editable').forEach(el => {
       el.setAttribute('contenteditable', 'true');
     });
-    formView.querySelectorAll('.btn-remove-row, .btn-sig-trigger, .btn-add-row').forEach(el => {
-      el.style.display = '';
-    });
   }
+
+  applyAuthUI();
 
   const box = document.getElementById('superadmin-override-box');
   if (box) box.style.display = 'none';
 
   updateStatusBanners();
-  applyAuthUI();
-  await saveDocument(true);
-  alert("🔓 Dokumen berhasil dibuka kuncinya! Status sekarang: PENDING.");
+
+  // Save changes to cloud & local
+  await saveDocumentToCloud();
+  alert("🔓 Dokumen berhasil dibuka kuncinya dan dikembalikan ke status MENUNGGU (PENDING).");
 }

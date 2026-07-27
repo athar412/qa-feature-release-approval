@@ -159,48 +159,96 @@ export function applyAuthUI() {
         return;
       }
 
-      // Hide all signature buttons initially
-      setElementStyle('btn-sig-qa-lead', 'display', 'none');
-      setElementStyle('btn-sig-tech-lead', 'display', 'none');
-      setElementStyle('btn-sig-product-owner', 'display', 'none');
+      // Hide approver action box initially
       setElementStyle('approver-action-box', 'display', 'none');
 
-      // ROLE PRIVILEGE RULES:
+      // ROLE PRIVILEGE RULES untuk dokumen PENDING:
       if (state.currentUser.role === 'super-admin') {
         setGeneralEditable(true);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(true);
-        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
-        setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
-        setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+        applySignoffRowPermissions(state.currentUser.role);
+        applySignatureHierarchy(state.currentUser.role);
         setElementStyle('approver-action-box', 'display', 'block');
       }
       else if (state.currentUser.role === 'qa-lead') {
         setGeneralEditable(true);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(true);
-        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
+        applySignoffRowPermissions(state.currentUser.role);
+        applySignatureHierarchy(state.currentUser.role);
       }
       else if (state.currentUser.role === 'tech-lead') {
         setGeneralEditable(false);
         setKnownIssuesEditable(false);
         setAddButtonsVisible(false);
-        setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
+        applySignoffRowPermissions(state.currentUser.role);
+        applySignatureHierarchy(state.currentUser.role);
       }
       else if (state.currentUser.role === 'product-owner') {
         setGeneralEditable(false);
-        setKnownIssuesEditable(true);
+        setKnownIssuesEditable(false);
         setAddButtonsVisible(false);
-        setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+        applySignoffRowPermissions(state.currentUser.role);
+        applySignatureHierarchy(state.currentUser.role);
         setElementStyle('approver-action-box', 'display', 'block');
       }
 
       updateStatusBanners();
     }
 
+export function applySignoffRowPermissions(userRole) {
+      const table = document.getElementById('signoff-table');
+      if (!table) return;
+
+      const roles = ['qa-lead', 'tech-lead', 'product-owner'];
+      roles.forEach(role => {
+        const row = table.querySelector(`tr[data-role-row="${role}"]`);
+        if (!row) return;
+
+        const canEdit = (userRole === 'super-admin' || userRole === role);
+        row.querySelectorAll('.editable, [contenteditable]').forEach(el => {
+          el.setAttribute('contenteditable', canEdit ? 'true' : 'false');
+          el.style.pointerEvents = canEdit ? 'auto' : 'none';
+        });
+        row.querySelectorAll('select').forEach(sel => {
+          sel.disabled = !canEdit;
+          sel.style.pointerEvents = canEdit ? 'auto' : 'none';
+        });
+      });
+    }
+
+export function applySignatureHierarchy(userRole) {
+      const qaSigned = !!document.querySelector('#sig-container-qa-lead img');
+      const techSigned = !!document.querySelector('#sig-container-tech-lead img');
+
+      // Default sembunyikan semua tombol TTD
+      setElementStyle('btn-sig-qa-lead', 'display', 'none');
+      setElementStyle('btn-sig-tech-lead', 'display', 'none');
+      setElementStyle('btn-sig-product-owner', 'display', 'none');
+
+      if (userRole === 'super-admin') {
+        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
+        setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
+        setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+      } else if (userRole === 'qa-lead') {
+        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
+      } else if (userRole === 'tech-lead') {
+        // Tech Lead baru bisa melihat tombol TTD jika QA Lead sudah TTD
+        if (qaSigned) {
+          setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
+        }
+      } else if (userRole === 'product-owner') {
+        // Manager baru bisa melihat tombol TTD jika Tech Lead sudah TTD
+        if (techSigned) {
+          setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+        }
+      }
+    }
+
 export function setGeneralEditable(enable) {
       document.querySelectorAll('[contenteditable], .editable-area, .doc-control-value, .editable, #rtm-table select, #defect-table select, #doc-system-prefix').forEach(el => {
-        if (el.closest('#section-known-issues')) return;
+        if (el.closest('#section-known-issues') || el.closest('#signoff-table')) return;
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
           el.disabled = !enable;
           if (enable) el.removeAttribute('readonly');
@@ -229,7 +277,19 @@ export function setKnownIssuesEditable(enable) {
     }
 
 export function setAddButtonsVisible(visible) {
-      document.querySelectorAll('.add-evidence-btn, .btn-add-row, .btn-remove-row, .flowchart-area input[type="file"], .evidence-card input[type="file"]').forEach(el => {
-        el.style.display = visible ? 'inline-flex' : 'none';
+      const formView = document.getElementById('form-view');
+      if (!formView) return;
+      const modElements = formView.querySelectorAll(
+        'button[onclick*="add"], button[onclick*="delete"], button[onclick*="import"], ' +
+        '.add-evidence-btn, .btn-add-row, .btn-remove-row, .flowchart-area input[type="file"], .evidence-card input[type="file"], input[type="file"]'
+      );
+      modElements.forEach(el => {
+        if (visible) {
+          el.style.display = '';
+          el.disabled = false;
+        } else {
+          el.style.display = 'none';
+          el.disabled = true;
+        }
       });
     }
