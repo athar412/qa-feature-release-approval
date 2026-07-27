@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { applyAuthUI } from './auth.js';
 
 export function openSignatureModal(role) {
       // HIERARKI STRUKTUR ORGANISASI TTD BERURUTAN (QA Lead -> Tech Lead -> PM)
@@ -106,4 +107,5 @@ export function applySignature() {
       window._signoffs[state.currentSigRole] = dataUrl;
 
       closeSignatureModal();
+      applyAuthUI();
     }

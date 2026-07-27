@@ -388,7 +388,7 @@
         <div class="label-helper no-print mt-16" style="font-size:11px; color:var(--text-muted);">Catatan: Klik pada sel tabel untuk mengedit. Gunakan dropdown pada kolom Status untuk mengubah status (Pass Rate akan diperbarui otomatis).</div>
         <div style="display: flex; gap: 10px;" class="no-print">
           <button class="mt-16 btn btn-outline-secondary" onclick="addRtmRow()" style="flex: 1;">+ Tambah Baris RTM</button>
-          <button class="mt-16 btn btn-outline-secondary" style="flex: 1;" onclick="document.getElementById('rtm-excel-input').click()">Impor Excel / CSV (RTM)</button>
+          <button class="mt-16 btn btn-outline-secondary btn-import-excel" style="flex: 1;" onclick="document.getElementById('rtm-excel-input').click()">Impor Excel / CSV (RTM)</button>
           <input type="file" id="rtm-excel-input" accept=".xlsx, .xls, .csv" style="display: none;" onchange="importRtmExcel(event)" />
         </div>
       </div>
@@ -516,7 +516,7 @@
         </div>
         <div style="display: flex; gap: 10px;" class="no-print">
           <button class="mt-16 btn btn-outline-secondary" onclick="addDefectRow()" style="flex: 1;">+ Tambah Baris Defect</button>
-          <button class="mt-16 btn btn-outline-secondary" style="flex: 1;" onclick="document.getElementById('defect-excel-input').click()">Impor Excel / CSV (Defect)</button>
+          <button class="mt-16 btn btn-outline-secondary btn-import-excel" style="flex: 1;" onclick="document.getElementById('defect-excel-input').click()">Impor Excel / CSV (Defect)</button>
           <input type="file" id="defect-excel-input" accept=".xlsx, .xls, .csv" style="display: none;" onchange="importDefectExcel(event)" />
         </div>
       </div>
@@ -651,7 +651,7 @@
 
         <p class="inline-label">Tanda Tangan Persetujuan</p>
         <span class="table-scroll-hint" aria-hidden="true">Geser tabel ke samping &#8596;</span>
-          <table class="signoff-table">
+          <table class="signoff-table" id="signoff-table">
           <thead>
             <tr>
               <th style="width:20%;">Peran</th>
@@ -730,9 +730,12 @@
         <div id="approver-action-box" class="no-print mt-16" style="display:none; background:#f8fafc; border:1px solid var(--border); padding:18px; border-radius:8px;">
           <p class="inline-label" style="color:var(--primary-dark);">Panel Persetujuan Manager / Lead</p>
           <p class="text-sub" style="margin-bottom:14px;">Sebagai Manager / Tech Lead, Anda dapat memberikan keputusan persetujuan akhir atau menolak pengajuan dokumen ini.</p>
+          <div id="approver-sig-warning" class="callout callout--warning mt-12 mb-12" style="display:none; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #b45309; background: #fffbeb; border: 1px solid #f59e0b; border-radius: 6px;">
+            ⚠️ Silakan bubuhkan Tanda Tangan Digital Anda pada Tabel Persetujuan Rilis (Poin 9) di baris Product Manager / Manager terlebih dahulu sebelum dapat menyetujui atau menolak dokumen.
+          </div>
           <div style="display:flex; gap:10px;">
-            <button class="btn btn-success" onclick="approveDocumentAction()">Setujui &amp; Kunci Dokumen (Disetujui)</button>
-            <button class="btn btn-danger" onclick="rejectDocumentAction()">Tolak Dokumen (Ditolak)</button>
+            <button id="btn-approve-doc" class="btn btn-success" onclick="approveDocumentAction()">Setujui &amp; Kunci Dokumen (Disetujui)</button>
+            <button id="btn-reject-doc" class="btn btn-danger" onclick="rejectDocumentAction()">Tolak Dokumen (Ditolak)</button>
           </div>
         </div>
       </div>

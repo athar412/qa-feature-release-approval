@@ -170,6 +170,7 @@ export function applyAuthUI() {
         applySignoffRowPermissions(state.currentUser.role);
         applySignatureHierarchy(state.currentUser.role);
         setElementStyle('approver-action-box', 'display', 'block');
+        applyApproverBoxState(state.currentUser.role);
       }
       else if (state.currentUser.role === 'qa-lead') {
         setGeneralEditable(true);
@@ -192,13 +193,51 @@ export function applyAuthUI() {
         applySignoffRowPermissions(state.currentUser.role);
         applySignatureHierarchy(state.currentUser.role);
         setElementStyle('approver-action-box', 'display', 'block');
+        applyApproverBoxState(state.currentUser.role);
       }
 
       updateStatusBanners();
     }
 
+export function applyApproverBoxState(userRole) {
+      const warningEl = document.getElementById('approver-sig-warning');
+      const btnApprove = document.getElementById('btn-approve-doc');
+      const btnReject = document.getElementById('btn-reject-doc');
+
+      if (!btnApprove || !btnReject) return;
+
+      if (userRole === 'product-owner') {
+        const poSigned = !!document.querySelector('#sig-container-product-owner img');
+        if (!poSigned) {
+          if (warningEl) warningEl.style.display = 'block';
+          btnApprove.disabled = true;
+          btnApprove.style.opacity = '0.5';
+          btnApprove.style.cursor = 'not-allowed';
+          btnReject.disabled = true;
+          btnReject.style.opacity = '0.5';
+          btnReject.style.cursor = 'not-allowed';
+        } else {
+          if (warningEl) warningEl.style.display = 'none';
+          btnApprove.disabled = false;
+          btnApprove.style.opacity = '1';
+          btnApprove.style.cursor = 'pointer';
+          btnReject.disabled = false;
+          btnReject.style.opacity = '1';
+          btnReject.style.cursor = 'pointer';
+        }
+      } else if (userRole === 'super-admin') {
+        if (warningEl) warningEl.style.display = 'none';
+        btnApprove.disabled = false;
+        btnApprove.style.opacity = '1';
+        btnApprove.style.cursor = 'pointer';
+        btnReject.disabled = false;
+        btnReject.style.opacity = '1';
+        btnReject.style.cursor = 'pointer';
+      }
+    }
+
 export function applySignoffRowPermissions(userRole) {
-      const table = document.getElementById('signoff-table');
+      const table = document.getElementById('signoff-table') || document.querySelector('.signoff-table');
       if (!table) return;
 
       const roles = ['qa-lead', 'tech-lead', 'product-owner'];
@@ -247,8 +286,14 @@ export function applySignatureHierarchy(userRole) {
     }
 
 export function setGeneralEditable(enable) {
-      document.querySelectorAll('[contenteditable], .editable-area, .doc-control-value, .editable, #rtm-table select, #defect-table select, #doc-system-prefix').forEach(el => {
-        if (el.closest('#section-known-issues') || el.closest('#signoff-table')) return;
+      const formView = document.getElementById('form-view');
+      if (!formView) return;
+
+      const elements = formView.querySelectorAll(
+        '[contenteditable], .editable-area, .doc-control-value, .editable, select, input, textarea'
+      );
+      elements.forEach(el => {
+        if (el.closest('#section-known-issues') || el.closest('.signoff-table') || el.closest('#signoff-table')) return;
         if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
           el.disabled = !enable;
           if (enable) el.removeAttribute('readonly');
@@ -279,17 +324,29 @@ export function setKnownIssuesEditable(enable) {
 export function setAddButtonsVisible(visible) {
       const formView = document.getElementById('form-view');
       if (!formView) return;
-      const modElements = formView.querySelectorAll(
-        'button[onclick*="add"], button[onclick*="delete"], button[onclick*="import"], ' +
-        '.add-evidence-btn, .btn-add-row, .btn-remove-row, .flowchart-area input[type="file"], .evidence-card input[type="file"], input[type="file"]'
+
+      // 1. Tombol yang dapat ditampilkan / disembunyikan
+      const buttons = formView.querySelectorAll(
+        'button[onclick*="add"], button[onclick*="delete"], .btn-import-excel, ' +
+        '.add-evidence-btn, .btn-add-row, .btn-remove-row'
       );
-      modElements.forEach(el => {
+      buttons.forEach(el => {
         if (visible) {
           el.style.display = '';
           el.disabled = false;
         } else {
           el.style.display = 'none';
           el.disabled = true;
+        }
+      });
+
+      // 2. Input file tersembunyi -> JANGAN ubah style.display agar tombol "Choose File" asli browser tidak pernah muncul!
+      const hiddenInputs = formView.querySelectorAll('input[type="file"]');
+      hiddenInputs.forEach(el => {
+        el.disabled = !visible;
+        if (el.closest('.flowchart-area') || el.closest('.evidence-card')) {
+          if (visible) el.style.display = '';
+          else el.style.display = 'none';
         }
       });
     }

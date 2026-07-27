@@ -388,6 +388,16 @@ export async function rejectDocumentAction() {
         return;
       }
 
+      const isSuper = state.currentUser && state.currentUser.role === 'super-admin';
+      if (!isSuper) {
+        const poContainer = document.getElementById('sig-container-product-owner');
+        const hasPoSignature = state.signedRoles['product-owner'] || (poContainer && poContainer.querySelector('img') !== null);
+        if (!hasPoSignature) {
+          alert("⚠️ Tanda Tangan Required:\n\nSilakan bubuhkan Tanda Tangan Digital Anda pada Tabel Persetujuan (Poin 9) di baris Product Manager / Manager terlebih dahulu sebelum menolak dokumen ini!");
+          return;
+        }
+      }
+
       const reason = prompt("Masukkan alasan penolakan rilis dokumen ini untuk perbaikan tim QA:");
       if (reason !== null && reason.trim() !== '') {
         state.docStatus = 'REJECTED';
@@ -504,7 +514,7 @@ export function lockDocumentUI() {
       el.setAttribute('contenteditable', 'false');
     });
     formView.querySelectorAll(
-      'button[onclick*="add"], button[onclick*="delete"], button[onclick*="import"], ' +
+      'button[onclick*="add"], button[onclick*="delete"], .btn-import-excel, ' +
       '.add-evidence-btn, .btn-add-row, .btn-remove-row, .btn-sig-trigger, input[type="file"]'
     ).forEach(el => {
       el.style.display = 'none';
