@@ -160,12 +160,15 @@
       var appCanvas = document.getElementById('dot-canvas-app');
       var loginCanvas = document.getElementById('dot-canvas-login');
       var homeView = document.getElementById('home-view');
+      var analyticsView = document.getElementById('analytics-view');
       var loginModal = document.getElementById('login-modal');
 
       var fields = [];
-      if (appCanvas && homeView) {
+      if (appCanvas) {
         fields.push(createDotField(appCanvas, function () {
-          return homeView.style.display !== 'none';
+          var isHome = homeView && homeView.style.display !== 'none';
+          var isAnalytics = analyticsView && analyticsView.style.display !== 'none';
+          return isHome || isAnalytics;
         }));
       }
       if (loginCanvas && loginModal) {

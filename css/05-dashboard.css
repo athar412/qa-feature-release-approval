@@ -1,5 +1,5 @@
     /* HOME VIEW & DASHBOARD SYSTEM */
-    #home-view {
+    #home-view, #analytics-view {
       max-width: 1200px;
       margin: 0 auto;
       padding: 32px 20px;
@@ -1087,7 +1087,7 @@
       transform: translateZ(0); /* paksa layer GPU sendiri agar fixed-position tidak jank saat momentum-scroll di Safari iOS */
       will-change: transform;
     }
-    #home-view, #form-view { position: relative; z-index: 1; }
+    #home-view, #form-view, #analytics-view { position: relative; z-index: 1; }
     #login-modal .login-dot-canvas {
       position: absolute;
       inset: 0;
