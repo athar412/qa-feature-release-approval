@@ -13,18 +13,32 @@ export function renderHistoryPopoverList() {
       const container = document.getElementById('popover-history-list');
       if (!container) return;
 
-      const docs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
-      const docIds = Object.keys(docs);
+      const mapDocs = {};
+      const localDocs = JSON.parse(localStorage.getItem('holycat_qa_docs') || '{}');
+      Object.keys(localDocs).forEach(id => {
+        mapDocs[id] = { id, ...localDocs[id] };
+      });
+      if (Array.isArray(state.allHomeDocs)) {
+        state.allHomeDocs.forEach(d => {
+          if (d && d.id) {
+            mapDocs[d.id] = { ...mapDocs[d.id], ...d };
+          }
+        });
+      }
 
-      if (docIds.length === 0) {
+      const allDocs = Object.values(mapDocs);
+      if (allDocs.length === 0) {
         container.innerHTML = '<div class="popover-empty">Belum ada riwayat dokumen.</div>';
         return;
       }
 
-      // Sort docs to show the 3 most recently updated ones
-      const sortedDocs = docIds
-        .map(id => ({ id, ...docs[id] }))
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+      const sortedDocs = allDocs
+        .sort((a, b) => {
+          const timeA = new Date(a.updatedAt || a.timestamp || a.date || 0).getTime() || 0;
+          const timeB = new Date(b.updatedAt || b.timestamp || b.date || 0).getTime() || 0;
+          if (timeB !== timeA) return timeB - timeA;
+          return (b.id || '').localeCompare(a.id || '');
+        })
         .slice(0, 3);
 
       container.innerHTML = '';
@@ -37,18 +51,19 @@ export function renderHistoryPopoverList() {
           setElementStyle('history-popover', 'display', 'none');
         };
 
-        const statusClass = doc.status === 'APPROVED' ? 'status--pass' : (doc.status === 'REJECTED' ? 'status--fail' : 'status--pending');
-        const statusText = doc.status === 'APPROVED' ? 'Disetujui' : (doc.status === 'REJECTED' ? 'Ditolak' : 'Pending');
+        const s = (doc.status || 'PENDING').toUpperCase();
+        const statusClass = s === 'APPROVED' ? 'status--pass' : (s === 'REJECTED' ? 'status--fail' : 'status--pending');
+        const statusText = s === 'APPROVED' ? 'Disetujui' : (s === 'REJECTED' ? 'Ditolak' : 'Pending');
 
         item.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="doc-num">${doc.id}</span>
             <span class="status ${statusClass}" style="font-size:8px; padding:1px 5px; text-transform:none;">${statusText}</span>
           </div>
-          <div class="doc-title-mini">${doc.docTitle || 'Feature Release Laporan'}</div>
+          <div class="doc-title-mini">${doc.docName || doc.docTitle || 'Formulir Persetujuan Rilis'}</div>
           <div class="doc-meta">
-            <span>Sprint: ${doc.sprintVersion || '-'}</span>
-            <span>v${doc.releaseVersion || '1.0.0'}</span>
+            <span>Sprint: ${doc.sprint || doc.sprintVersion || '-'}</span>
+            <span>v${doc.releaseVersion || doc.doc_version || '1.0'}</span>
           </div>
         `;
         container.appendChild(item);
@@ -133,7 +148,13 @@ export async function renderHistoryTable() {
 
 export function showHistoryPopover() {
   const popover = document.getElementById('history-popover');
-  if (popover) popover.style.display = 'flex';
+  if (popover) {
+    if (!state.allHomeDocs || state.allHomeDocs.length === 0) {
+      fetchAllDocumentsForHome().then(() => renderHistoryPopoverList());
+    }
+    renderHistoryPopoverList();
+    popover.style.display = 'flex';
+  }
 }
 
 export function hideHistoryPopover() {

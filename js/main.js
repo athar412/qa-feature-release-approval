@@ -2,6 +2,7 @@ import { state } from './state.js';
 import './globals.js';
 import { checkAuth } from './auth.js';
 import { showHomeView, showFormView } from './navigation.js';
+import { showAnalyticsView } from './analytics.js';
 import './dot-cursor.js'; // Execute dot cursor effect
 
 // 1. Snapshot Pristine HTML
@@ -42,8 +43,11 @@ try {
 window.addEventListener('load', function() {
   const params = new URLSearchParams(window.location.search);
   const urlDocId = params.get('id');
+  const view = params.get('view');
   
-  if (urlDocId) {
+  if (view === 'analytics') {
+    showAnalyticsView();
+  } else if (urlDocId) {
     showFormView(urlDocId);
   } else {
     showHomeView();

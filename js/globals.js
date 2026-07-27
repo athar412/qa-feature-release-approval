@@ -12,8 +12,13 @@ import { updateAutoDocNumber, bakeSelectedOptions, getFormState, resetCurrentFor
 import { renderHomeDashboard, filterHomeDocsList, fetchAllDocumentsForHome, openDocumentFromHome } from './dashboard.js';
 import { syncSelectPrintValues } from './print.js';
 import { toggleMobileMenu, showHomeView, showFormView, createNewDocument, scrollToDocumentsList } from './navigation.js';
+import { showAnalyticsView, renderAnalyticsList, renderAnalyticsCharts, computeAnalytics } from './analytics.js';
 
 Object.assign(window, {
+  showAnalyticsView,
+  renderAnalyticsList,
+  renderAnalyticsCharts,
+  computeAnalytics,
   setElementStyle,
   deleteTableRow,
   deleteRevisionRow,

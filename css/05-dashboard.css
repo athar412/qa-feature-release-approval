@@ -1098,4 +1098,24 @@
       pointer-events: none;
     }
 
+    /* ── ANALYTICS VIEW CHARTS GRID ── */
+    .analytics-charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .analytics-chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      min-height: 340px;
+      display: flex;
+      flex-direction: column;
+    }
+    .analytics-chart-card canvas {
+      max-height: 300px;
+    }
+
     /* ═══════════════════════════════════════════════════════════════ */

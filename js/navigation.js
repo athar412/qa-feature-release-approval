@@ -15,6 +15,7 @@ export function toggleMobileMenu() {
 export function showHomeView() {
       setElementStyle('home-view', 'display', 'block');
       setElementStyle('form-view', 'display', 'none');
+      setElementStyle('analytics-view', 'display', 'none');
       setElementStyle('nav-btn-home', 'display', 'none');
       
       // Badge "QA APPROVAL" hanya relevan sebagai identitas produk di Beranda —
@@ -38,6 +39,7 @@ export function showHomeView() {
 export function showFormView(docId) {
       setElementStyle('home-view', 'display', 'none');
       setElementStyle('form-view', 'display', 'block');
+      setElementStyle('analytics-view', 'display', 'none');
       setElementStyle('nav-btn-home', 'display', 'inline-flex');
 
       // Sembunyikan badge "QA APPROVAL": di halaman Form QA navbar dipadati tombol

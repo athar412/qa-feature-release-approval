@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { renderAnalyticsCharts } from './analytics.js';
 
 export function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -8,6 +9,11 @@ export function toggleTheme() {
       localStorage.setItem('holycat_theme', newTheme);
 
       updateThemeToggleIcon(newTheme);
+
+      const analyticsView = document.getElementById('analytics-view');
+      if (analyticsView && analyticsView.style.display === 'block') {
+        renderAnalyticsCharts();
+      }
     }
 
 export function updateThemeToggleIcon(theme) {

@@ -204,6 +204,7 @@
       .history-popover .popover-item { padding: 12px !important; }
       .filter-bar { grid-template-columns: 1fr !important; }
       .doc-watermark { background-size: 85% !important; }
+      .analytics-charts-grid { grid-template-columns: 1fr !important; }
     }
 
     /* ── HP KECIL (≤480px): kepadatan ekstra ── */
