@@ -53,3 +53,10 @@ window.addEventListener('load', function() {
     showHomeView();
   }
 });
+
+// Global delegated change listener for select styling and data-val sync
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.tagName === 'SELECT') {
+    e.target.setAttribute('data-val', e.target.value);
+  }
+});

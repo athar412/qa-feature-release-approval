@@ -234,8 +234,12 @@ export async function loadDocumentFromCloud(docId) {
 
           if (!error && data && data.document_data) {
             const supabaseData = data.document_data;
-            docs[docId] = supabaseData;
-            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            try {
+              docs[docId] = supabaseData;
+              localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            } catch (storageErr) {
+              console.warn('⚠️ localStorage penuh saat memuat dari Supabase. Mengabaikan simpan lokal dan tetap merender:', storageErr);
+            }
             renderLoadedDoc(supabaseData);
             console.log('Document loaded successfully from Supabase!');
             return; // Skip KVDB if Supabase succeeded
@@ -253,8 +257,12 @@ export async function loadDocumentFromCloud(docId) {
         if (response.ok) {
           const cloudData = await response.json();
           if (cloudData && cloudData.id) {
-            docs[docId] = cloudData;
-            localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            try {
+              docs[docId] = cloudData;
+              localStorage.setItem('holycat_qa_docs', JSON.stringify(docs));
+            } catch (storageErr) {
+              console.warn('⚠️ localStorage penuh saat memuat dari Legacy Cloud DB:', storageErr);
+            }
             renderLoadedDoc(cloudData);
             console.log('Document synced from Legacy Cloud DB!');
           }
@@ -320,6 +328,9 @@ export function renderLoadedDoc(data) {
 
       updateStatusBanners();
       applyAuthUI();
+      if (state.docStatus === 'APPROVED' || state.docStatus === 'REJECTED') {
+        lockDocumentUI();
+      }
       updateMetricsFromRtm(); // Hitung ulang Pass Rate & progress bar segera setelah dokumen dimuat
     }
 
@@ -335,14 +346,21 @@ export async function approveDocumentAction() {
         return;
       }
 
-      // RULE REQUIREMENT: MANAGER MUST SIGN HIMSELF FIRST BEFORE APPROVING!
-      const poContainer = document.getElementById('sig-container-product-owner');
-      const hasPoSignature = state.signedRoles['product-owner'] || (poContainer && poContainer.querySelector('img') !== null);
+      // RULE REQUIREMENT: MANAGER MUST SIGN HIMSELF AND ENFORCE ORGANIZATION HIERARCHY (ALL 3 ROLES SIGNED) BEFORE APPROVING!
+      const isSuper = state.currentUser && state.currentUser.role === 'super-admin';
+      if (!isSuper) {
+        const qaImg = document.querySelector('#sig-container-qa-lead img');
+        const techImg = document.querySelector('#sig-container-tech-lead img');
+        const poContainer = document.getElementById('sig-container-product-owner');
+        const hasPoSignature = state.signedRoles['product-owner'] || (poContainer && poContainer.querySelector('img') !== null);
 
-      if (!hasPoSignature) {
-        alert("⚠️ PERHATIAN MANAGER:\n\nAnda belum melakukan Tanda Tangan Digital pada tabel persetujuan! Silakan lakukan tanda tangan digital Anda terlebih dahulu sebelum menyetujui rilis.");
-        openSignatureModal('product-owner');
-        return;
+        if (!qaImg || !techImg || !hasPoSignature) {
+          alert("⚠️ Hierarki Organisasi:\n\nDokumen baru dapat disetujui akhir (Approved & Locked) jika seluruh 3 tanda tangan (QA Lead, Engineering Lead, dan Product Manager) telah terisi lengkap!");
+          if (!hasPoSignature && qaImg && techImg) {
+            openSignatureModal('product-owner');
+          }
+          return;
+        }
       }
 
       if (confirm("Apakah Anda yakin ingin MENYETUJUI rilis fitur ini ke lingkungan Production? Dokumen akan dikunci secara formal setelah disetujui.")) {
@@ -474,4 +492,88 @@ export function lockDocumentUI() {
   setElementStyle('btn-sig-tech-lead', 'display', 'none');
   setElementStyle('btn-sig-product-owner', 'display', 'none');
   setElementStyle('approver-action-box', 'display', 'none');
+
+  // LOCK TOTAL 100% INTERAKSI CRUD, DROPDOWN, CHECKBOX, RADIO BUTTON, DAN SEL EDITABLE DI DALAM FORM
+  const formView = document.getElementById('form-view');
+  if (formView) {
+    formView.querySelectorAll('input, select, textarea').forEach(el => {
+      el.disabled = true;
+    });
+    formView.querySelectorAll('.editable, [contenteditable="true"]').forEach(el => {
+      el.setAttribute('contenteditable', 'false');
+    });
+    formView.querySelectorAll('.btn-remove-row, .btn-sig-trigger, .btn-add-row').forEach(el => {
+      el.style.display = 'none';
+    });
+  }
+
+  // Tampilkan kotak Override jika logged-in user adalah super-admin
+  showSuperAdminOverrideBox();
+}
+
+export function showSuperAdminOverrideBox() {
+  let box = document.getElementById('superadmin-override-box');
+  if (!box) {
+    const bannerContainer = document.getElementById('status-banner-container');
+    if (bannerContainer) {
+      box = document.createElement('div');
+      box.id = 'superadmin-override-box';
+      box.className = 'no-print mt-12 mb-12';
+      box.style.cssText = 'background:#fef2f2; border:1px solid #ef4444; padding:14px 18px; border-radius:8px; display:none; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;';
+      box.innerHTML = `
+        <div>
+          <span style="font-weight:700; color:#b91c1c;">🔓 Panel Super Admin Override</span>
+          <p style="margin:4px 0 0; font-size:13px; color:#991b1b;">Dokumen ini dikunci permanen (APPROVED). Sebagai Super Admin, Anda berwenang membuka kunci untuk modifikasi darurat.</p>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="unlockDocumentUIBySuperAdmin()">Buka Kunci Dokumen (Unlock to PENDING)</button>
+      `;
+      bannerContainer.parentNode.insertBefore(box, bannerContainer.nextSibling);
+    }
+  }
+
+  if (state.currentUser && state.currentUser.role === 'super-admin' && (state.docStatus === 'APPROVED' || state.docStatus === 'REJECTED')) {
+    if (box) box.style.display = 'flex';
+  } else {
+    if (box) box.style.display = 'none';
+  }
+}
+
+export async function unlockDocumentUIBySuperAdmin() {
+  if (!state.currentUser || state.currentUser.role !== 'super-admin') {
+    alert("⛔ Akses Ditolak: Hanya Super Admin yang berwenang membuka kunci dokumen ini!");
+    return;
+  }
+  if (!confirm("⚠️ APAKAH ANDA YAKIN ingin membuka kunci dokumen [APPROVED] ini menjadi [PENDING]? Seluruh input akan kembali dapat diedit.")) {
+    return;
+  }
+
+  state.docStatus = 'PENDING';
+  setGeneralEditable(true);
+  setKnownIssuesEditable(true);
+  setAddButtonsVisible(true);
+  setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
+  setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
+  setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+  setElementStyle('approver-action-box', 'display', 'block');
+
+  const formView = document.getElementById('form-view');
+  if (formView) {
+    formView.querySelectorAll('input, select, textarea').forEach(el => {
+      el.disabled = false;
+    });
+    formView.querySelectorAll('.editable').forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+    });
+    formView.querySelectorAll('.btn-remove-row, .btn-sig-trigger, .btn-add-row').forEach(el => {
+      el.style.display = '';
+    });
+  }
+
+  const box = document.getElementById('superadmin-override-box');
+  if (box) box.style.display = 'none';
+
+  updateStatusBanners();
+  applyAuthUI();
+  await saveDocument(true);
+  alert("🔓 Dokumen berhasil dibuka kuncinya! Status sekarang: PENDING.");
 }

@@ -8,7 +8,7 @@ import { previewFlowchart, previewEvidence } from './upload.js';
 import { processLogin, logoutUser, checkAuth, handleAuthClick, applyAuthUI, setGeneralEditable, setKnownIssuesEditable, setAddButtonsVisible } from './auth.js';
 import { toggleSharePopover, executeShareCopy, copyShareUrlDirect, shareDocumentLink } from './share.js';
 import { loadHistoryDocument, renderHistoryPopoverList, closeHistoryModal, openHistoryModal, renderHistoryTable, showHistoryPopover, hideHistoryPopover } from './history.js';
-import { updateAutoDocNumber, bakeSelectedOptions, getFormState, resetCurrentForm, clearAllLocalStorageData, saveDocument, saveDocumentToCloud, loadDocumentFromCloud, saveDocumentSilently, loadDocument, renderLoadedDoc, approveDocumentAction, rejectDocumentAction, approveRelease, rejectRelease, deleteDocumentAction, lockDocumentUI } from './document-store.js';
+import { updateAutoDocNumber, bakeSelectedOptions, getFormState, resetCurrentForm, clearAllLocalStorageData, saveDocument, saveDocumentToCloud, loadDocumentFromCloud, saveDocumentSilently, loadDocument, renderLoadedDoc, approveDocumentAction, rejectDocumentAction, approveRelease, rejectRelease, deleteDocumentAction, lockDocumentUI, unlockDocumentUIBySuperAdmin } from './document-store.js';
 import { renderHomeDashboard, filterHomeDocsList, fetchAllDocumentsForHome, openDocumentFromHome } from './dashboard.js';
 import { syncSelectPrintValues } from './print.js';
 import { toggleMobileMenu, showHomeView, showFormView, createNewDocument, scrollToDocumentsList } from './navigation.js';
@@ -82,6 +82,7 @@ Object.assign(window, {
   rejectRelease,
   deleteDocumentAction,
   lockDocumentUI,
+  unlockDocumentUIBySuperAdmin,
   renderHomeDashboard,
   filterHomeDocsList,
   fetchAllDocumentsForHome,

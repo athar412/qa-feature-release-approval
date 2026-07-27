@@ -1,6 +1,25 @@
 import { state } from './state.js';
 
 export function openSignatureModal(role) {
+      // HIERARKI STRUKTUR ORGANISASI TTD BERURUTAN (QA Lead -> Tech Lead -> PM)
+      const isSuper = state.currentUser && state.currentUser.role === 'super-admin';
+      if (!isSuper) {
+        if (role === 'tech-lead') {
+          const qaImg = document.querySelector('#sig-container-qa-lead img');
+          if (!qaImg) {
+            alert("⚠️ Hierarki Organisasi:\n\nEngineering Lead / Tech Lead baru dapat menandatangani dokumen ini setelah QA Lead memberikan tanda tangan digital terlebih dahulu.");
+            return;
+          }
+        } else if (role === 'product-owner') {
+          const qaImg = document.querySelector('#sig-container-qa-lead img');
+          const techImg = document.querySelector('#sig-container-tech-lead img');
+          if (!qaImg || !techImg) {
+            alert("⚠️ Hierarki Organisasi:\n\nProduct Manager / PO baru dapat menandatangani dan menyetujui rilis setelah tim QA Lead dan Tech Lead memberikan tanda tangan digital terlebih dahulu.");
+            return;
+          }
+        }
+      }
+
       state.currentSigRole = role;
       const modal = document.getElementById('signature-modal');
       if (modal) {

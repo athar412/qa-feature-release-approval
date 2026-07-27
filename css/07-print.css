@@ -84,7 +84,8 @@
       select[data-val="HIGH"],
       select[data-val="Fail"],
       select[data-val="FAILED"],
-      select[data-val="REJECTED"] {
+      select[data-val="REJECTED"],
+      select[data-val="NO_GO"] {
         color: #991B1B !important;
         background-color: #FEE2E2 !important;
         border-color: rgba(153, 27, 27, 0.35) !important;
@@ -96,7 +97,8 @@
       select[data-val="In Progress"],
       select[data-val="N/A"],
       select[data-val="PENDING"],
-      select[data-val="SKIPPED"] {
+      select[data-val="SKIPPED"],
+      select[data-val="CONDITIONAL"] {
         color: #92400E !important;
         background-color: #FEF3C7 !important;
         border-color: rgba(146, 64, 14, 0.32) !important;
@@ -107,10 +109,11 @@
       select[data-val="Pass"],
       select[data-val="PASSED"],
       select[data-val="Closed"],
-      select[data-val="APPROVED"] {
-        color: #166534 !important;
-        background-color: #DCFCE7 !important;
-        border-color: rgba(22, 101, 52, 0.32) !important;
+      select[data-val="APPROVED"],
+      select[data-val="GO"] {
+        color: #065F46 !important;
+        background-color: #D1FAE5 !important;
+        border-color: rgba(6, 95, 70, 0.3) !important;
       }
       /* ABU — sengaja tidak dikerjakan */
       select[data-val="Won't Fix"] {

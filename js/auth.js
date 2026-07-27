@@ -19,7 +19,9 @@ export function processLogin() {
 
       let user = null;
 
-      if (usernameInput.includes('qa')) {
+      if (usernameInput.includes('super') || usernameInput.includes('admin') || usernameInput === 'super.admin') {
+        user = { username: usernameInput, role: 'super-admin', title: 'Super Admin (System Administrator)', name: 'System Super Admin' };
+      } else if (usernameInput.includes('qa')) {
         user = { username: usernameInput, role: 'qa-lead', title: 'QA Lead (Quality Assurance)', name: 'Budi Santoso' };
       } else if (usernameInput.includes('tech')) {
         user = { username: usernameInput, role: 'tech-lead', title: 'Tech Lead (Senior System Architect)', name: 'Eko Prasetyo' };
@@ -164,7 +166,16 @@ export function applyAuthUI() {
       setElementStyle('approver-action-box', 'display', 'none');
 
       // ROLE PRIVILEGE RULES:
-      if (state.currentUser.role === 'qa-lead') {
+      if (state.currentUser.role === 'super-admin') {
+        setGeneralEditable(true);
+        setKnownIssuesEditable(true);
+        setAddButtonsVisible(true);
+        setElementStyle('btn-sig-qa-lead', 'display', 'inline-flex');
+        setElementStyle('btn-sig-tech-lead', 'display', 'inline-flex');
+        setElementStyle('btn-sig-product-owner', 'display', 'inline-flex');
+        setElementStyle('approver-action-box', 'display', 'block');
+      }
+      else if (state.currentUser.role === 'qa-lead') {
         setGeneralEditable(true);
         setKnownIssuesEditable(true);
         setAddButtonsVisible(true);

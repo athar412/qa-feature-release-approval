@@ -654,16 +654,27 @@
           <table class="signoff-table">
           <thead>
             <tr>
-              <th style="width:28%;">Peran</th>
-              <th style="width:24%;">Nama Pemegang Peran</th>
-              <th style="width:30%;">Tanda Tangan Digital</th>
-              <th style="width:18%;">Tanggal</th>
+              <th style="width:20%;">Peran</th>
+              <th style="width:18%;">Nama Pemegang Peran</th>
+              <th style="width:16%;">Keputusan Rilis</th>
+              <th style="width:22%;">Catatan / Komentar Khusus</th>
+              <th style="width:14%;">Tanda Tangan Digital</th>
+              <th style="width:10%;">Tanggal</th>
             </tr>
           </thead>
           <tbody>
             <tr data-role-row="qa-lead">
               <td class="signoff-role">QA Lead / Specialist</td>
               <td><span class="editable" contenteditable="true" data-placeholder="Nama QA Lead..."></span></td>
+              <td>
+                <select class="form-control" style="font-weight:600; font-size:12px;" data-val="">
+                  <option value="">- Pilih Keputusan -</option>
+                  <option value="GO" style="color:#065F46; font-weight:700;">✅ GO (Layak Rilis)</option>
+                  <option value="CONDITIONAL" style="color:#d97706; font-weight:700;">⚠️ CONDITIONAL (Bersyarat)</option>
+                  <option value="NO_GO" style="color:#dc2626; font-weight:700;">❌ NO GO (Ditolak / Butuh Revisi)</option>
+                </select>
+              </td>
+              <td><span class="editable" contenteditable="true" data-placeholder="Catatan hasil uji QA..."></span></td>
               <td>
                 <div class="signoff-cell">
                   <div class="signoff-img-container" id="sig-container-qa-lead"></div>
@@ -676,6 +687,15 @@
               <td class="signoff-role">Engineering Lead / Tech Lead</td>
               <td><span class="editable" contenteditable="true" data-placeholder="Nama Tech Lead..."></span></td>
               <td>
+                <select class="form-control" style="font-weight:600; font-size:12px;" data-val="">
+                  <option value="">- Pilih Keputusan -</option>
+                  <option value="GO" style="color:#065F46; font-weight:700;">✅ GO (Layak Rilis)</option>
+                  <option value="CONDITIONAL" style="color:#d97706; font-weight:700;">⚠️ CONDITIONAL (Bersyarat)</option>
+                  <option value="NO_GO" style="color:#dc2626; font-weight:700;">❌ NO GO (Ditolak / Butuh Revisi)</option>
+                </select>
+              </td>
+              <td><span class="editable" contenteditable="true" data-placeholder="Catatan audit arsitektur..."></span></td>
+              <td>
                 <div class="signoff-cell">
                   <div class="signoff-img-container" id="sig-container-tech-lead"></div>
                   <button class="btn btn-sm btn-outline-secondary no-print btn-sig-trigger" id="btn-sig-tech-lead" onclick="openSignatureModal('tech-lead')">Tanda Tangan Digital</button>
@@ -686,6 +706,15 @@
             <tr data-role-row="product-owner">
               <td class="signoff-role">Product Manager / Manager</td>
               <td><span class="editable" contenteditable="true" data-placeholder="Nama Manager..."></span></td>
+              <td>
+                <select class="form-control" style="font-weight:600; font-size:12px;" data-val="">
+                  <option value="">- Pilih Keputusan -</option>
+                  <option value="GO" style="color:#065F46; font-weight:700;">✅ GO (Layak Rilis)</option>
+                  <option value="CONDITIONAL" style="color:#d97706; font-weight:700;">⚠️ CONDITIONAL (Bersyarat)</option>
+                  <option value="NO_GO" style="color:#dc2626; font-weight:700;">❌ NO GO (Ditolak / Butuh Revisi)</option>
+                </select>
+              </td>
+              <td><span class="editable" contenteditable="true" data-placeholder="Catatan persetujuan bisnis..."></span></td>
               <td>
                 <div class="signoff-cell">
                   <div class="signoff-img-container" id="sig-container-product-owner"></div>
