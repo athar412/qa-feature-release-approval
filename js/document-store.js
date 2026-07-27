@@ -326,6 +326,17 @@ export function renderLoadedDoc(data) {
         });
       }
 
+      // PERBAIKAN KOMPATIBILITAS MUNDUR: Suntikkan class .btn-import-excel ke tombol impor pada HTML lama dari database
+      document.querySelectorAll('button[onclick*="excel-input"], button[onclick*="import"]').forEach(btn => {
+        btn.classList.add('btn-import-excel');
+      });
+      document.querySelectorAll('button').forEach(btn => {
+        const txt = (btn.textContent || '').toLowerCase();
+        if (txt.includes('impor excel') || txt.includes('import excel')) {
+          btn.classList.add('btn-import-excel');
+        }
+      });
+
       updateStatusBanners();
       applyAuthUI();
       if (state.docStatus === 'APPROVED' || state.docStatus === 'REJECTED') {
@@ -515,9 +526,16 @@ export function lockDocumentUI() {
     });
     formView.querySelectorAll(
       'button[onclick*="add"], button[onclick*="delete"], .btn-import-excel, ' +
+      'button[onclick*="excel-input"], button[onclick*="import"], ' +
       '.add-evidence-btn, .btn-add-row, .btn-remove-row, .btn-sig-trigger, input[type="file"]'
     ).forEach(el => {
       el.style.display = 'none';
+    });
+    formView.querySelectorAll('button').forEach(btn => {
+      const txt = (btn.textContent || '').toLowerCase();
+      if (txt.includes('impor excel') || txt.includes('import excel')) {
+        btn.style.display = 'none';
+      }
     });
   }
 

@@ -325,9 +325,10 @@ export function setAddButtonsVisible(visible) {
       const formView = document.getElementById('form-view');
       if (!formView) return;
 
-      // 1. Tombol yang dapat ditampilkan / disembunyikan
+      // 1. Tombol yang dapat ditampilkan / disembunyikan (mendukung selektor modern .btn-import-excel maupun dokumen lama bermuatan atribut onclick)
       const buttons = formView.querySelectorAll(
         'button[onclick*="add"], button[onclick*="delete"], .btn-import-excel, ' +
+        'button[onclick*="excel-input"], button[onclick*="import"], ' +
         '.add-evidence-btn, .btn-add-row, .btn-remove-row'
       );
       buttons.forEach(el => {
@@ -337,6 +338,20 @@ export function setAddButtonsVisible(visible) {
         } else {
           el.style.display = 'none';
           el.disabled = true;
+        }
+      });
+
+      // Fallback kompatibilitas mundur: periksa teks tombol untuk dokumen sangat lama yang tidak memiliki class/onclick standar
+      formView.querySelectorAll('button').forEach(btn => {
+        const txt = (btn.textContent || '').toLowerCase();
+        if (txt.includes('impor excel') || txt.includes('import excel')) {
+          if (visible) {
+            btn.style.display = '';
+            btn.disabled = false;
+          } else {
+            btn.style.display = 'none';
+            btn.disabled = true;
+          }
         }
       });
 
