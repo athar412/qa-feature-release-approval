@@ -3,6 +3,7 @@ import './globals.js';
 import { checkAuth } from './auth.js';
 import { showHomeView, showFormView } from './navigation.js';
 import { showAnalyticsView } from './analytics.js';
+import { updateMetricsFromRtm } from './metrics.js';
 import './dot-cursor.js'; // Execute dot cursor effect
 
 // 1. Snapshot Pristine HTML
@@ -54,9 +55,19 @@ window.addEventListener('load', function() {
   }
 });
 
-// Global delegated change listener for select styling and data-val sync
+// Global delegated change listener for select styling, data-val sync, and realtime RTM metrics calculation
 document.addEventListener('change', function(e) {
   if (e.target && e.target.tagName === 'SELECT') {
     e.target.setAttribute('data-val', e.target.value);
+  }
+  if (e.target && e.target.closest('#rtm-table')) {
+    updateMetricsFromRtm();
+  }
+});
+
+// Realtime RTM metrics update saat teks di dalam tabel RTM diedit langsung
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.closest('#rtm-table')) {
+    updateMetricsFromRtm();
   }
 });
